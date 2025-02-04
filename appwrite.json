@@ -1,0 +1,72 @@
+{
+    "projectId": "679f39070028a199ce1c",
+    "projectName": "testing",
+    "settings": {
+        "services": {
+            "account": true,
+            "avatars": true,
+            "databases": true,
+            "locale": true,
+            "health": true,
+            "storage": true,
+            "teams": true,
+            "users": true,
+            "functions": true,
+            "graphql": true,
+            "messaging": true
+        },
+        "auth": {
+            "methods": {
+                "jwt": true,
+                "phone": true,
+                "invites": true,
+                "anonymous": true,
+                "email-otp": true,
+                "magic-url": true,
+                "email-password": true
+            },
+            "security": {
+                "duration": 31536000,
+                "limit": 0,
+                "sessionsLimit": 10,
+                "passwordHistory": 0,
+                "passwordDictionary": false,
+                "personalDataCheck": false,
+                "sessionAlerts": false,
+                "mockNumbers": []
+            }
+        }
+    },
+    "teams": [
+        {
+            "$id": "679fa32f0001fc63b65e",
+            "name": "Admins"
+        },
+        {
+            "$id": "679fa341000fa4cb6a03",
+            "name": "Co-ordinators"
+        },
+        {
+            "$id": "679fa348002509b2cacf",
+            "name": "Students"
+        }
+    ],
+    "functions": [
+        {
+            "$id": "67a0471f0032e4822f6c",
+            "name": "addUserToTeam",
+            "runtime": "dart-3.5",
+            "specification": "s-1vcpu-512mb",
+            "execute": [],
+            "events": [],
+            "scopes": [],
+            "schedule": "",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "lib/main.dart",
+            "commands": "",
+            "path": "functions/testing"
+        }
+    ]
+}
