@@ -80,7 +80,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 120),
+                  const SizedBox(height: 80),
                   TextFormField(
                     controller: nameController,
                     validator: nameValidator,
@@ -111,7 +111,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       hintText: "Password",
                     ),
                   ),
-                  SizedBox(height: 40),
+                  SizedBox(height: 80),
                   ElevatedButton(
                     onPressed: _createUser,
                     child: Text(
@@ -128,16 +128,17 @@ class _SignUpPageState extends State<SignUpPage> {
                     onTap: () => Navigator.of(context).push(LoginPage.route()),
                     child: RichText(
                       text: TextSpan(
-                          text: "Already have an account? ",
-                          style: Theme.of(context).textTheme.titleMedium,
-                          children: [
-                            TextSpan(
-                              text: "Sign In",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )
-                          ]),
+                        text: "Already have an account? ",
+                        style: Theme.of(context).textTheme.titleMedium,
+                        children: [
+                          TextSpan(
+                            text: "Sign In",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   )
                 ],

@@ -1,10 +1,25 @@
 import 'dart:convert';
 
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart';
 import 'package:mainapp/constants/appwrite.dart';
 import 'package:mainapp/models/user_model.dart';
 
 class AuthRemoteRepository {
+  Future<UserModel?> logInUser({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final Session session = await Appwrite.account.createEmailPasswordSession(
+        email: email,
+        password: password,
+      );
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
   Future<UserModel?> createUser({
     required String email,
     required String password,
@@ -12,7 +27,7 @@ class AuthRemoteRepository {
     required String phoneNumber,
   }) async {
     try {
-      final user = await Appwrite.account.create(
+      final User user = await Appwrite.account.create(
         userId: ID.unique(),
         email: email,
         password: password,

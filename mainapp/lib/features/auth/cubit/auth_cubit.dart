@@ -9,6 +9,28 @@ class AuthCubit extends Cubit<AuthState> {
 
   final authRemoteRepository = AuthRemoteRepository();
 
+  void logInUser({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      emit(AuthLoading());
+      final UserModel? user = await authRemoteRepository.logInUser(
+        email: email,
+        password: password,
+      );
+
+    if (user == null) {
+      emit(AuthError("User not found"));
+      return;
+    }
+    
+
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
   void createUser({
     required String name,
     required String email,
