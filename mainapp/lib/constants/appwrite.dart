@@ -1,11 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:appwrite/appwrite.dart';
-import 'package:mainapp/constants/constants.dart';
 
 class Appwrite {
-  static final Client client = Client()
-      .setEndpoint(Constants.projectEndPoint)
-      .setProject(Constants.projectName);
+  static String projectEndPoint = 'localhost:';
+  static String projectName = '679f3b49000acb35b37c';
+
+  static final Client client =
+      Client().setEndpoint(projectEndPoint).setProject(projectName);
 
   static final Account account = Account(client);
   static final Teams teams = Teams(client);

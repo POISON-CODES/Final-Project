@@ -3,17 +3,39 @@ import 'dart:convert';
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:mainapp/constants/appwrite.dart';
+import 'package:mainapp/core/utils/types.dart';
 import 'package:mainapp/models/user_model.dart';
 
 class AuthRemoteRepository {
-  Future<UserModel?> logInUser({
+  Future<Result<UserModel>> logInUser({
     required String email,
     required String password,
   }) async {
     try {
-      final Session session = await Appwrite.account.createEmailPasswordSession(
+      await Appwrite.account.createEmailPasswordSession(
         email: email,
         password: password,
+      );
+      print(Appwrite.adminTeamId);
+      MembershipList adminTeamList =
+          await Appwrite.teams.listMemberships(teamId: Appwrite.adminTeamId);
+      print(2);
+      MembershipList coordTeamList = await Appwrite.teams
+          .listMemberships(teamId: Appwrite.coordinatorTeamId);
+
+      final String userTeamId =
+          adminTeamList.memberships.any((m) => m.teamId == Appwrite.adminTeamId)
+              ? Appwrite.adminTeamId
+              : coordTeamList.memberships
+                      .any((m) => m.teamId == Appwrite.coordinatorTeamId)
+                  ? Appwrite.coordinatorTeamId
+                  : Appwrite.studentTeamId;
+
+      return Result(
+        userModel: UserModel.fromAppwrite(
+          await Appwrite.account.get(),
+        ),
+        teamId: userTeamId,
       );
     } catch (e) {
       throw e.toString();

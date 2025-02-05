@@ -3,16 +3,21 @@ import 'dart:convert';
 
 import 'package:appwrite/models.dart';
 
+enum Position { Admin, Coordinator, Student }
+
 class UserModel {
   final String id;
   final String name;
   final String email;
   final String phoneNumber;
+  Position? position;
+
   UserModel({
     required this.id,
     required this.name,
     required this.email,
     required this.phoneNumber,
+    this.position = Position.Student,
   });
 
   factory UserModel.fromAppwrite(User user) {
@@ -21,6 +26,7 @@ class UserModel {
       name: user.name,
       email: user.email,
       phoneNumber: user.phone,
+      position: Position.Student,
     );
   }
 
@@ -29,12 +35,14 @@ class UserModel {
     String? name,
     String? email,
     String? phoneNumber,
+    Position? position,
   }) {
     return UserModel(
       id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      position: position ?? this.position,
     );
   }
 
@@ -44,15 +52,20 @@ class UserModel {
       'name': name,
       'email': email,
       'phoneNumber': phoneNumber,
+      'position': position?.name,
     };
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      id: map['id'] ?? "",
-      name: map['name'] ?? "",
-      email: map['email'] ?? "",
-      phoneNumber: map['phoneNumber'] ?? "",
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      email: map['email'] ?? '',
+      phoneNumber: map['phoneNumber'] ?? '',
+      position: Position.values.firstWhere(
+        (e) => e == map['position'],
+        orElse: () => Position.Student,
+      ),
     );
   }
 
@@ -63,7 +76,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber,)';
+    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, position: $position)';
   }
 
   @override
@@ -73,11 +86,16 @@ class UserModel {
     return other.id == id &&
         other.name == name &&
         other.email == email &&
-        other.phoneNumber == phoneNumber;
+        other.phoneNumber == phoneNumber &&
+        other.position == position;
   }
 
   @override
   int get hashCode {
-    return id.hashCode ^ name.hashCode ^ email.hashCode ^ phoneNumber.hashCode;
+    return id.hashCode ^
+        name.hashCode ^
+        email.hashCode ^
+        phoneNumber.hashCode ^
+        position.hashCode;
   }
 }
