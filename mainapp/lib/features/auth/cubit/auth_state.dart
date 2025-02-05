@@ -8,19 +8,21 @@ final class AuthLoading extends AuthState {}
 
 final class AuthSignUp extends AuthState {}
 
-final class AuthAdmin extends AuthState {
+final class AuthLogin extends AuthState {
   final UserModel user;
-  AuthAdmin(this.user);
+  AuthLogin(this.user);
 }
 
-final class AuthMid extends AuthState {
-  final UserModel user;
-  AuthMid(this.user);
+final class AuthAdmin extends AuthLogin {
+  AuthAdmin(super.user);
 }
 
-final class AuthStudent extends AuthState {
-  final UserModel user;
-  AuthStudent(this.user);
+final class AuthMid extends AuthLogin {
+  AuthMid(super.user);
+}
+
+final class AuthStudent extends AuthLogin {
+  AuthStudent(super.user);
 }
 
 final class AuthError extends AuthState {

@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:mainapp/constants/appwrite.dart';
-import 'package:mainapp/core/utils/types.dart';
+import 'package:mainapp/constants/enums.dart';
 import 'package:mainapp/models/user_model.dart';
 
 class AuthRemoteRepository {
-  Future<Result<UserModel>> logInUser({
+  Future<UserModel> logInUser({
     required String email,
     required String password,
   }) async {
@@ -16,29 +16,45 @@ class AuthRemoteRepository {
         email: email,
         password: password,
       );
-      print(Appwrite.adminTeamId);
-      MembershipList adminTeamList =
-          await Appwrite.teams.listMemberships(teamId: Appwrite.adminTeamId);
-      print(2);
-      MembershipList coordTeamList = await Appwrite.teams
-          .listMemberships(teamId: Appwrite.coordinatorTeamId);
 
-      final String userTeamId =
-          adminTeamList.memberships.any((m) => m.teamId == Appwrite.adminTeamId)
-              ? Appwrite.adminTeamId
-              : coordTeamList.memberships
-                      .any((m) => m.teamId == Appwrite.coordinatorTeamId)
-                  ? Appwrite.coordinatorTeamId
-                  : Appwrite.studentTeamId;
+      final user = await Appwrite.account.get();
 
-      return Result(
-        userModel: UserModel.fromAppwrite(
-          await Appwrite.account.get(),
-        ),
-        teamId: userTeamId,
-      );
+      final teamIds = [
+        Appwrite.adminTeamId,
+        Appwrite.coordinatorTeamId,
+        Appwrite.studentTeamId
+      ];
+
+      MembershipList? userTeamList;
+      String userTeamId = '';
+
+      for (var teamId in teamIds) {
+        try {
+          userTeamList = await Appwrite.teams.listMemberships(teamId: teamId);
+          final isMember =
+              userTeamList.memberships.any((m) => m.userId == user.$id);
+
+          if (isMember) {
+            userTeamId = teamId;
+            break;
+          }
+        } catch (e) {
+          continue;
+        }
+      }
+
+      final userModel = UserModel.fromAppwrite(user);
+      userModel.position = userTeamId == Appwrite.adminTeamId
+          ? Position.admin
+          : userTeamId == Appwrite.coordinatorTeamId
+              ? Position.coordinator
+              : Position.student;
+
+      return userModel;
+    } on AppwriteException catch (e) {
+      throw Exception('Login failed: ${e.message}');
     } catch (e) {
-      throw e.toString();
+      throw Exception('Unexpected error: $e');
     }
   }
 
@@ -56,14 +72,12 @@ class AuthRemoteRepository {
         name: name,
       );
 
-      final membership = await Appwrite.functions.createExecution(
+      await Appwrite.functions.createExecution(
           functionId: Appwrite.addUserToTeam,
           body: json.encode({
             "userId": user.$id,
             "teamId": Appwrite.studentTeamId,
           }));
-
-      print(membership.functionId);
 
       return UserModel.fromAppwrite(user);
     } catch (e) {

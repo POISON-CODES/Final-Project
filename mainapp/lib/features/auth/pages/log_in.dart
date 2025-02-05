@@ -46,22 +46,11 @@ class _LoginPageState extends State<LoginPage> {
                 content: Text(state.error),
               ),
             );
-          } else if (state is AuthAdmin) {
+          } else if (state is AuthLogin) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text("User Login Successful - Admin"),
-              ),
-            );
-          } else if (state is AuthMid) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("User Login Successful - Coordinator"),
-              ),
-            );
-          } else if (state is AuthStudent) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("User Login Successful - Student"),
+                content:
+                    Text("User Login Successful - ${state.user.position.name}"),
               ),
             );
           }

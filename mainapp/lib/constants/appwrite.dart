@@ -14,7 +14,7 @@ class Appwrite {
   static final Teams teams = Teams(client);
   static final Functions functions = Functions(client);
 
-  static final String adminTeamId = '67a356550023850a1f58';
+  static final String adminTeamId = '67a3a529002dc3bb99a5';
   static final String coordinatorTeamId = '67a356480037d1ad2c27';
   static final String studentTeamId = '67a356370034c7d30d4e';
 

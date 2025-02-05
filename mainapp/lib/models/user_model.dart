@@ -9,7 +9,7 @@ class UserModel {
   final String name;
   final String email;
   final String phoneNumber;
-  final Position position;
+  Position position;
 
   UserModel({
     required this.id,
