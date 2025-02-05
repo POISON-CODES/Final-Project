@@ -56,12 +56,14 @@ class AuthRemoteRepository {
         name: name,
       );
 
-      await Appwrite.functions.createExecution(
-          functionId: '67a0471f0032e4822f6c',
+      final membership = await Appwrite.functions.createExecution(
+          functionId: Appwrite.addUserToTeam,
           body: json.encode({
             "userId": user.$id,
             "teamId": Appwrite.studentTeamId,
           }));
+
+      print(membership.functionId);
 
       return UserModel.fromAppwrite(user);
     } catch (e) {

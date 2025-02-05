@@ -2,19 +2,21 @@
 import 'package:appwrite/appwrite.dart';
 
 class Appwrite {
-  static String projectEndPoint = 'localhost:';
-  static String projectName = '679f3b49000acb35b37c';
+  static String projectEndPoint = 'https://10.5.107.136/v1';
+  static String projectName = '67a351b601aca4ed39db';
 
-  static final Client client =
-      Client().setEndpoint(projectEndPoint).setProject(projectName);
+  static final Client client = Client()
+      .setEndpoint(projectEndPoint)
+      .setProject(projectName)
+      .setSelfSigned();
 
   static final Account account = Account(client);
   static final Teams teams = Teams(client);
   static final Functions functions = Functions(client);
 
-  static final String adminTeamId = '679fa32f0001fc63b65e';
-  static final String coordinatorTeamId = '679fa341000fa4cb6a03';
-  static final String studentTeamId = '679fa348002509b2cacf';
+  static final String adminTeamId = '67a356550023850a1f58';
+  static final String coordinatorTeamId = '67a356480037d1ad2c27';
+  static final String studentTeamId = '67a356370034c7d30d4e';
 
-  static final String addUserToTeam = '67a0471f0032e4822f6c';
+  static final String addUserToTeam = '67a352b30004ab7b74ed';
 }

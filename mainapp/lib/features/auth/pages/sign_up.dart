@@ -85,7 +85,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     controller: nameController,
                     validator: nameValidator,
                     decoration: InputDecoration(
-                      hintText: "Name",
+                      label: Text("Name"),
                     ),
                   ),
                   SizedBox(height: 10),
@@ -93,14 +93,16 @@ class _SignUpPageState extends State<SignUpPage> {
                     controller: emailController,
                     validator: emailValidator,
                     decoration: InputDecoration(
-                      hintText: "Email ID",
+                      label: Text("E-mail ID"),
                     ),
                   ),
                   SizedBox(height: 10),
                   TextFormField(
                     controller: phoneController,
                     validator: phoneValidator,
-                    decoration: InputDecoration(hintText: "Phone Number"),
+                    decoration: InputDecoration(
+                      label: Text("Phone Number"),
+                    ),
                   ),
                   SizedBox(height: 10),
                   TextFormField(
@@ -108,7 +110,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     obscureText: true,
                     validator: passwordValidator,
                     decoration: InputDecoration(
-                      hintText: "Password",
+                      label: Text("Password"),
                     ),
                   ),
                   SizedBox(height: 80),

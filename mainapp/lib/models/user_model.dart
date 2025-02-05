@@ -2,22 +2,21 @@
 import 'dart:convert';
 
 import 'package:appwrite/models.dart';
-
-enum Position { Admin, Coordinator, Student }
+import 'package:mainapp/constants/enums.dart';
 
 class UserModel {
   final String id;
   final String name;
   final String email;
   final String phoneNumber;
-  Position? position;
+  final Position position;
 
   UserModel({
     required this.id,
     required this.name,
     required this.email,
     required this.phoneNumber,
-    this.position = Position.Student,
+    this.position = Position.student,
   });
 
   factory UserModel.fromAppwrite(User user) {
@@ -26,7 +25,7 @@ class UserModel {
       name: user.name,
       email: user.email,
       phoneNumber: user.phone,
-      position: Position.Student,
+      position: Position.student,
     );
   }
 
@@ -47,12 +46,12 @@ class UserModel {
   }
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
+    return {
       'id': id,
       'name': name,
       'email': email,
       'phoneNumber': phoneNumber,
-      'position': position?.name,
+      'position': position.name, // Store as a string
     };
   }
 
@@ -62,10 +61,7 @@ class UserModel {
       name: map['name'] ?? '',
       email: map['email'] ?? '',
       phoneNumber: map['phoneNumber'] ?? '',
-      position: Position.values.firstWhere(
-        (e) => e == map['position'],
-        orElse: () => Position.Student,
-      ),
+      position: Position.values.byName(map['position'] ?? 'student'),
     );
   }
 
@@ -76,7 +72,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, position: $position)';
+    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, position: ${position.name})';
   }
 
   @override

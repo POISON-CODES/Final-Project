@@ -1,4 +1,4 @@
-# testing
+# addUserToTeam
 
 ## 🧰 Usage
 
