@@ -23,7 +23,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
     super.initState();
@@ -82,8 +81,9 @@ class _MyAppState extends State<MyApp> {
       home: BlocBuilder<AuthCubit, AuthState>(builder: (context, state) {
         if (state is AuthLogin) {
           return const HomePage();
+        } else {
+          return const SignUpPage();
         }
-        return const SignUpPage();
       }),
     );
   }

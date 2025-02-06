@@ -10,6 +10,7 @@ class AuthCubit extends Cubit<AuthState> {
   final authRemoteRepository = AuthRemoteRepository();
 
   void getInitialUser() async {
+    emit(AuthLoading());
     final user = await authRemoteRepository.getCurrentUser();
 
     if (user == null) {
