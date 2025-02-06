@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
 import 'package:mainapp/features/auth/pages/sign_up.dart';
+import 'package:mainapp/features/home/pages/home_page.dart';
 
 void main() {
   runApp(MultiBlocProvider(
@@ -14,10 +15,21 @@ void main() {
   ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<AuthCubit>().getInitialUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -67,10 +79,12 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: SignUpPage(),
+      home: BlocBuilder<AuthCubit, AuthState>(builder: (context, state) {
+        if (state is AuthLogin) {
+          return const HomePage();
+        }
+        return const SignUpPage();
+      }),
     );
   }
 }
-
-
-

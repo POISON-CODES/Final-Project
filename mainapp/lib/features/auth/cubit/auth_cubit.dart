@@ -9,6 +9,16 @@ class AuthCubit extends Cubit<AuthState> {
 
   final authRemoteRepository = AuthRemoteRepository();
 
+  void getInitialUser() async {
+    final user = await authRemoteRepository.getCurrentUser();
+
+    if (user == null) {
+      emit(AuthInitial());
+      return;
+    }
+    emit(AuthLogin(user));
+  }
+
   void logInUser({
     required String email,
     required String password,

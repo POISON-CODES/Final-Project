@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mainapp/core/utils/validators.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
 import 'package:mainapp/features/auth/pages/sign_up.dart';
+import 'package:mainapp/features/home/pages/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -47,12 +48,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             );
           } else if (state is AuthLogin) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content:
-                    Text("User Login Successful - ${state.user.position.name}"),
-              ),
-            );
+            Navigator.of(context).push(HomePage.route());
           }
         },
         builder: (context, state) {
