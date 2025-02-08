@@ -2,7 +2,7 @@
 import 'package:appwrite/appwrite.dart';
 
 class Appwrite {
-  static String projectEndPoint = 'https://10.5.107.136/v1';
+  static String projectEndPoint = 'https://192.168.82.117/v1';
   static String projectName = '67a351b601aca4ed39db';
 
   static final Client client = Client()

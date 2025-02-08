@@ -13,6 +13,7 @@ class AuthRemoteRepository {
     try {
       user = await Appwrite.account.get();
     } catch (e) {
+      user = null;
       return null;
     }
 
@@ -23,7 +24,7 @@ class AuthRemoteRepository {
     ];
 
     MembershipList? userTeamList;
-    String userTeamId = '';
+    String userTeamId = Appwrite.studentTeamId;
 
     for (var teamId in teamIds) {
       try {

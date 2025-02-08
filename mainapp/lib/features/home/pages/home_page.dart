@@ -1,13 +1,17 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:mainapp/constants/enums.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
+import 'package:mainapp/features/companies/pages/create_new_company.dart';
+import 'package:mainapp/features/configurations/pages/change_configuration.dart';
 import 'package:mainapp/features/home/pages/tabs/home_page_tab.dart';
 import 'package:mainapp/features/home/pages/tabs/search_page_tab.dart';
 import 'package:mainapp/features/home/pages/tabs/settings_page_tab.dart';
+
+import '../../../custom/widgets/floating_action_button.dart';
 
 class HomePage extends StatefulWidget {
   static MaterialPageRoute route() =>
@@ -28,52 +32,29 @@ class _HomePageState extends State<HomePage> {
         return Scaffold(
           floatingActionButton:
               (state is AuthLogin && state.user.position == Position.admin)
-                  // ? FloatingActionButton(
-                  //     isExtended: true,
-                  //     shape: CircleBorder(),
-                  //     onPressed: () {},
-                  //     child: Icon(CupertinoIcons.plus),
-                  //   )
-                  ? SpeedDial(
-                      spaceBetweenChildren: 10,
-                      spacing: 10,
-                      overlayOpacity: 0,
-                      icon: Icons.add,
-                      animatedIconTheme: IconThemeData(size: 22),
-                      backgroundColor: Colors.white,
-                      visible: true,
-                      curve: Curves.ease,
+                  ? customFloatingActionButton(
+                      context: context,
+                      mainIcon: Icons.add,
                       children: [
-                        SpeedDialChild(
-                          child: Icon(Icons.description),
-                          onTap: () {},
-                          label: 'Create a new Form',
-                          labelStyle: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
-                              fontSize: 16.0),
-                        ),
-                        SpeedDialChild(
-                          child: Icon(Icons.edit_note),
-                          onTap: () {},
-                          label: 'Create an Update',
-                          labelStyle: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
-                              fontSize: 16.0),
-                        ),
-                        // FAB 2
-                        SpeedDialChild(
-                          child: Icon(Icons.business),
-                          onTap: () {},
-                          label: 'Create a new Company',
-                          labelStyle: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
-                              fontSize: 16.0),
-                        )
-                      ],
-                    )
+                          CustomFABChild(
+                              label: 'Create New Form',
+                              onTap: () {},
+                              icon: Icon(Icons.description)),
+                          CustomFABChild(
+                              label: 'Create Update',
+                              onTap: () {},
+                              icon: Icon(Icons.edit_note)),
+                          CustomFABChild(
+                              label: 'Create Company',
+                              onTap: () => Navigator.of(context)
+                                  .push(CreateNewCompanyPage.route()),
+                              icon: Icon(Icons.business)),
+                          CustomFABChild(
+                              label: 'Update Configuration',
+                              onTap: () => Navigator.of(context)
+                                  .push(ChangeConfiguration.route()),
+                              icon: Icon(Icons.settings)),
+                        ])
                   : null,
           body: (_selectedPage == 0)
               ? HomePageTab()
