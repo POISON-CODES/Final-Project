@@ -51,8 +51,14 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
               ),
               ElevatedButton(
                 onPressed: _createNewCompany,
-                child: Text("SUBMIT"),
-              )
+                child: const Text(
+                  'SIGN UP',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ],
           ),
         ),

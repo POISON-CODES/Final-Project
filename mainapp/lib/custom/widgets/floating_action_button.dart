@@ -5,6 +5,8 @@ SpeedDial customFloatingActionButton({
   required BuildContext context,
   required List<CustomFABChild> children,
   required IconData mainIcon,
+  void Function()? onPress
+
 }) {
   return SpeedDial(
     spaceBetweenChildren: 10,

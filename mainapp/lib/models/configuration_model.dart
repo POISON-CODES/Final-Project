@@ -5,15 +5,15 @@ import 'package:appwrite/models.dart';
 import 'package:mainapp/constants/enums.dart';
 
 class ConfigurationModel {
-  final String id;
-  final Department department;
-  final String course;
-  final String specializaiton;
-  final String courseCode;
-  final String hoi;
-  final String facultyCoordinator;
-  final List<String?> studentList;
-  final GraduationStatus status;
+  final String id; //auto
+  final Department department; //enum
+  final String course; //input
+  final String specializaiton; //input
+  final String courseCode; //input
+  final String hoi; //input
+  final String facultyCoordinator; //input
+  final List<String?> studentList; // auto
+  final GraduationStatus status; // enum 
 
   ConfigurationModel({
     required this.id,

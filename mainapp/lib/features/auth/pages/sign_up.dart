@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mainapp/core/utils/validators.dart';
+import 'package:mainapp/custom/widgets/generic_form_field.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
 import 'package:mainapp/features/auth/pages/log_in.dart';
 
@@ -81,37 +82,36 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                   const SizedBox(height: 80),
-                  TextFormField(
-                    controller: nameController,
+                  CustomFormField(
+                    courseController: nameController,
+                    obscureText: false,
+                    textInputType: TextInputType.text,
+                    labelText: 'Name',
                     validator: nameValidator,
-                    decoration: InputDecoration(
-                      label: Text("Name"),
-                    ),
                   ),
                   SizedBox(height: 10),
-                  TextFormField(
-                    controller: emailController,
+                  CustomFormField(
+                    courseController: nameController,
+                    obscureText: false,
+                    textInputType: TextInputType.emailAddress,
+                    labelText: 'E-mail',
                     validator: emailValidator,
-                    decoration: InputDecoration(
-                      label: Text("E-mail ID"),
-                    ),
                   ),
                   SizedBox(height: 10),
-                  TextFormField(
-                    controller: phoneController,
+                  CustomFormField(
+                    courseController: nameController,
+                    obscureText: false,
+                    textInputType: TextInputType.phone,
+                    labelText: 'Phone Number',
                     validator: phoneValidator,
-                    decoration: InputDecoration(
-                      label: Text("Phone Number"),
-                    ),
                   ),
                   SizedBox(height: 10),
-                  TextFormField(
-                    controller: passwordController,
-                    obscureText: true,
-                    validator: passwordValidator,
-                    decoration: InputDecoration(
-                      label: Text("Password"),
-                    ),
+                  CustomFormField(
+                    courseController: nameController,
+                    obscureText: false,
+                    textInputType: TextInputType.text,
+                    labelText: 'Password',
+                    validator: nameValidator,
                   ),
                   SizedBox(height: 80),
                   ElevatedButton(

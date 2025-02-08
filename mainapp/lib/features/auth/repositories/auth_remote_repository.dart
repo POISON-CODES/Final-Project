@@ -109,12 +109,15 @@ class AuthRemoteRepository {
     required String phoneNumber,
   }) async {
     try {
-      final User user = await Appwrite.account.create(
+      User user = await Appwrite.account.create(
         userId: ID.unique(),
         email: email,
         password: password,
         name: name,
       );
+
+      // user = await Appwrite.account
+      //     .updatePhone(phone: phoneNumber, password: password);
 
       await Appwrite.functions.createExecution(
           functionId: Appwrite.addUserToTeam,
@@ -123,7 +126,18 @@ class AuthRemoteRepository {
             "teamId": Appwrite.studentTeamId,
           }));
 
-      return UserModel.fromAppwrite(user);
+      final userModel =
+          UserModel.fromAppwrite(user).copyWith(phoneNumber: phoneNumber);
+
+      final Document document = await Appwrite.databases.createDocument(
+          databaseId: Appwrite.crcDatabase,
+          collectionId: Appwrite.usersCollection,
+          documentId: user.$id,
+          data: userModel.toMap());
+
+      print(document.toString());
+
+      return userModel;
     } catch (e) {
       throw e.toString();
     }

@@ -2,7 +2,7 @@
 import 'package:appwrite/appwrite.dart';
 
 class Appwrite {
-  static String projectEndPoint = 'https://192.168.82.117/v1';
+  static String projectEndPoint = 'https://10.0.0.23/v1';
   static String projectName = '67a351b601aca4ed39db';
 
   static final Client client = Client()
@@ -13,6 +13,12 @@ class Appwrite {
   static final Account account = Account(client);
   static final Teams teams = Teams(client);
   static final Functions functions = Functions(client);
+  static final Databases databases = Databases(client);
+
+  static final String crcDatabase = '67a5a03a000bf36ee5a9';
+  static final String constantsCollection = '67a6ffd3001301054ce0';
+  static final String usersCollection = '67a6fef2003d7ef6d69f';
+  static final String companiesCollection = '67a5a04200109abb5416';
 
   static final String adminTeamId = '67a3a529002dc3bb99a5';
   static final String coordinatorTeamId = '67a356480037d1ad2c27';
