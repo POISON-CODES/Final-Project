@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mainapp/custom/widgets/app_bar.dart';
-import 'package:mainapp/custom/widgets/floating_action_button.dart';
+
+import 'package:mainapp/custom/widgets/custom_global_widgets.dart';
 import 'package:mainapp/features/configurations/pages/create_configuration.dart';
 
 class ChangeConfiguration extends StatefulWidget {

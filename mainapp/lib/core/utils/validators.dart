@@ -1,3 +1,5 @@
+part of 'utils.dart';
+
 String? passwordValidator(String? val) {
   if (val == null || val.trim().isEmpty) {
     return 'Password is required';

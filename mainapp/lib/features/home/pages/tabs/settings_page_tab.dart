@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+part of 'tabs.dart';
 
 class SettingsPageTab extends StatelessWidget {
   const SettingsPageTab({super.key});

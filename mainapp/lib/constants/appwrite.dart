@@ -1,5 +1,5 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:appwrite/appwrite.dart';
+part of 'constants.dart';
+
 
 class Appwrite {
   static String projectEndPoint = 'https://10.0.0.23/v1';

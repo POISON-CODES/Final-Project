@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mainapp/features/auth/repositories/auth_remote_repository.dart';
-import 'package:mainapp/models/user_model.dart';
+import 'package:mainapp/models/models.dart';
 
 part 'auth_state.dart';
 

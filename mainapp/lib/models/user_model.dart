@@ -1,8 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
 
-import 'package:appwrite/models.dart';
-import 'package:mainapp/constants/enums.dart';
+part of 'models.dart';
+
 
 class UserModel {
   final String id;

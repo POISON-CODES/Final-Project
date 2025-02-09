@@ -3,15 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:mainapp/constants/enums.dart';
+import 'package:mainapp/constants/constants.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
 import 'package:mainapp/features/companies/pages/create_new_company.dart';
 import 'package:mainapp/features/configurations/pages/change_configuration.dart';
-import 'package:mainapp/features/home/pages/tabs/home_page_tab.dart';
-import 'package:mainapp/features/home/pages/tabs/search_page_tab.dart';
-import 'package:mainapp/features/home/pages/tabs/settings_page_tab.dart';
+import 'package:mainapp/features/home/pages/tabs/tabs.dart';
 
-import '../../../custom/widgets/floating_action_button.dart';
+import '../../../custom/widgets/custom_global_widgets.dart';
 
 class HomePage extends StatefulWidget {
   static MaterialPageRoute route() =>

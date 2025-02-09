@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mainapp/core/utils/validators.dart';
+import 'package:mainapp/core/utils/utils.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
 import 'package:mainapp/features/auth/pages/sign_up.dart';
 import 'package:mainapp/features/home/pages/home_page.dart';

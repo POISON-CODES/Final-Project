@@ -1,3 +1,5 @@
+part of 'constants.dart';
+
 enum Position { admin, coordinator, student }
 
 enum Department {

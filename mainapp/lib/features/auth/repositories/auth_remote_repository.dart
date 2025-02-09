@@ -2,9 +2,8 @@ import 'dart:convert';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
-import 'package:mainapp/constants/appwrite.dart';
-import 'package:mainapp/constants/enums.dart';
-import 'package:mainapp/models/user_model.dart';
+import 'package:mainapp/constants/constants.dart';
+import 'package:mainapp/models/models.dart';
 
 class AuthRemoteRepository {
   Future<UserModel?> getCurrentUser() async {
@@ -116,9 +115,6 @@ class AuthRemoteRepository {
         name: name,
       );
 
-      // user = await Appwrite.account
-      //     .updatePhone(phone: phoneNumber, password: password);
-
       await Appwrite.functions.createExecution(
           functionId: Appwrite.addUserToTeam,
           body: json.encode({
@@ -129,13 +125,11 @@ class AuthRemoteRepository {
       final userModel =
           UserModel.fromAppwrite(user).copyWith(phoneNumber: phoneNumber);
 
-      final Document document = await Appwrite.databases.createDocument(
+      await Appwrite.databases.createDocument(
           databaseId: Appwrite.crcDatabase,
           collectionId: Appwrite.usersCollection,
           documentId: user.$id,
           data: userModel.toMap());
-
-      print(document.toString());
 
       return userModel;
     } catch (e) {

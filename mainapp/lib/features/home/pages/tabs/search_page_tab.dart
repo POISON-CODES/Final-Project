@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+part of 'tabs.dart';
 
 class SearchPageTab extends StatelessWidget {
   const SearchPageTab({super.key});

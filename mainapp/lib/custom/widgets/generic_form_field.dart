@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+part of 'custom_global_widgets.dart';
 
 class CustomFormField extends StatefulWidget {
   final TextEditingController courseController;
@@ -40,20 +40,22 @@ class _CustomFormFieldState extends State<CustomFormField> {
       onTapOutside: (_) => FocusScope.of(context).unfocus(),
       obscureText: _obscureText,
       decoration: InputDecoration(
-        suffixIcon: IconButton(
-          onPressed: () {
-            setState(() {
-              _obscureText = !_obscureText;
-            });
-          },
-          icon: Icon(
-            _obscureText ? Icons.visibility : Icons.visibility_off,
-          ),
-        ),
+        suffixIcon: widget.obscureText
+            ? IconButton(
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
+                icon: Icon(
+                  _obscureText ? Icons.visibility : Icons.visibility_off,
+                ),
+              )
+            : null, // Hide the suffix icon if obscureText is false
         label: Text(" ${widget.labelText} "),
         labelStyle: TextStyle(
           fontWeight: FontWeight.bold,
-          color: Colors.grey.shade600,
+          color: Colors.grey,
         ),
         border: const OutlineInputBorder(),
       ),

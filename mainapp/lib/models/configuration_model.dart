@@ -1,25 +1,21 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
-import 'package:appwrite/models.dart';
-import 'package:mainapp/constants/enums.dart';
+part of 'models.dart';
 
 class ConfigurationModel {
   final String id; //auto
   final Department department; //enum
   final String course; //input
-  final String specializaiton; //input
+  final String specialization; //input
   final String courseCode; //input
   final String hoi; //input
   final String facultyCoordinator; //input
   final List<String?> studentList; // auto
-  final GraduationStatus status; // enum 
+  final GraduationStatus status; // enum
 
   ConfigurationModel({
     required this.id,
     required this.department,
     required this.course,
-    required this.specializaiton,
+    required this.specialization,
     required this.courseCode,
     required this.hoi,
     required this.facultyCoordinator,
@@ -29,21 +25,23 @@ class ConfigurationModel {
 
   factory ConfigurationModel.fromAppwrite(Document doc) => ConfigurationModel(
         id: doc.$id,
-        department: Department.values.byName(doc.data['department']),
+        department:
+            Department.values.byName(doc.data['department'].toLowerCase()),
         course: doc.data['course'],
-        specializaiton: doc.data['specializaiton'],
+        specialization: doc.data['specialization'],
         courseCode: doc.data['courseCode'],
         hoi: doc.data['hoi'],
         facultyCoordinator: doc.data['facultyCoordinator'],
-        studentList: doc.data['studentList'],
-        status: GraduationStatus.values.byName(doc.data['graduateStatus']),
+        studentList: (doc.data['studentList'] as List).cast<String>(),
+        status: GraduationStatus.values
+            .byName(doc.data['graduateStatus'].toLowerCase()),
       );
 
   ConfigurationModel copyWith({
     String? id,
     Department? department,
     String? course,
-    String? specializaiton,
+    String? specialization,
     String? courseCode,
     String? hoi,
     String? facultyCoordinator,
@@ -54,7 +52,7 @@ class ConfigurationModel {
       id: id ?? this.id,
       department: department ?? this.department,
       course: course ?? this.course,
-      specializaiton: specializaiton ?? this.specializaiton,
+      specialization: specialization ?? this.specialization,
       courseCode: courseCode ?? this.courseCode,
       hoi: hoi ?? this.hoi,
       facultyCoordinator: facultyCoordinator ?? this.facultyCoordinator,
@@ -68,7 +66,7 @@ class ConfigurationModel {
       'id': id,
       'department': department.name,
       'course': course,
-      'specializaiton': specializaiton,
+      'specialization': specialization,
       'courseCode': courseCode,
       'hoi': hoi,
       'facultyCoordinator': facultyCoordinator,
@@ -82,7 +80,7 @@ class ConfigurationModel {
       id: map['id'] ?? '',
       department: Department.values.byName(map['position']),
       course: map['course'] ?? '',
-      specializaiton: map['specializaiton'] ?? '',
+      specialization: map['specialization'] ?? '',
       courseCode: map['courseCode'] ?? '',
       hoi: map['hoi'] ?? '',
       facultyCoordinator: map['facultyCoordinator'] ?? '',
@@ -98,7 +96,7 @@ class ConfigurationModel {
 
   @override
   String toString() {
-    return 'ConfigurationModel(id: $id, department: ${department.name}, course: $course, specializaiton: $specializaiton, courseCode: $courseCode, hoi: $hoi, facultyCoordinator: $facultyCoordinator, studentList: $studentList, status: ${status.name})';
+    return 'ConfigurationModel(id: $id, department: ${department.name}, course: $course, specialization: $specialization, courseCode: $courseCode, hoi: $hoi, facultyCoordinator: $facultyCoordinator, studentList: $studentList, status: ${status.name})';
   }
 
   @override
@@ -108,7 +106,7 @@ class ConfigurationModel {
     return other.id == id &&
         other.department == department &&
         other.course == course &&
-        other.specializaiton == specializaiton &&
+        other.specialization == specialization &&
         other.courseCode == courseCode &&
         other.hoi == hoi &&
         other.facultyCoordinator == facultyCoordinator &&
@@ -121,7 +119,7 @@ class ConfigurationModel {
     return id.hashCode ^
         department.hashCode ^
         course.hashCode ^
-        specializaiton.hashCode ^
+        specialization.hashCode ^
         courseCode.hashCode ^
         hoi.hashCode ^
         facultyCoordinator.hashCode ^

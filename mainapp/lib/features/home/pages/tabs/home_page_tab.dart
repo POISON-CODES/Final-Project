@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+part of 'tabs.dart';
 
 class HomePageTab extends StatelessWidget {
   const HomePageTab({super.key});
