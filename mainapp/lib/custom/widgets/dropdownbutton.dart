@@ -1,6 +1,6 @@
 part of 'custom_global_widgets.dart';
 
-class CustomDropDown extends StatelessWidget {
+class CustomDropDown extends FormFields {
   final List<String> itemsList;
   final void Function(String?) onChanged;
   final String label;
@@ -13,20 +13,25 @@ class CustomDropDown extends StatelessWidget {
   });
 
   @override
+  State<CustomDropDown> createState() => _CustomDropDownState();
+}
+
+class _CustomDropDownState extends State<CustomDropDown> {
+  @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField(
       menuMaxHeight: 400,
       decoration: InputDecoration(
-        label: Text(" $label "),
+        label: Text(" ${widget.label} "),
         labelStyle: TextStyle(
           color: Colors.grey,
         ),
-        hintText: label,
+        hintText: widget.label,
         hintStyle: TextStyle(
           color: Colors.grey,
         ),
       ),
-      items: itemsList
+      items: widget.itemsList
           .map(
             (val) => DropdownMenuItem(
               value: val,
@@ -34,7 +39,7 @@ class CustomDropDown extends StatelessWidget {
             ),
           )
           .toList(),
-      onChanged: onChanged,
+      onChanged: widget.onChanged,
     );
   }
 }

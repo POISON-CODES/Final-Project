@@ -5,8 +5,23 @@ class SettingsPageTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text("Settings"),
+    return Scaffold(
+      appBar: CustomAppBar(
+        title: "Settings",
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.edit),
+            ),
+          )
+        ],
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [],
+      ),
     );
   }
 }

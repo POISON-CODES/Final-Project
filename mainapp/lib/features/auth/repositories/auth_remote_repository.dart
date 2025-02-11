@@ -17,13 +17,13 @@ class AuthRemoteRepository {
     }
 
     final teamIds = [
-      Appwrite.adminTeamId,
-      Appwrite.coordinatorTeamId,
-      Appwrite.studentTeamId
+      TeamIds.adminTeamId,
+      TeamIds.coordinatorTeamId,
+      TeamIds.studentTeamId
     ];
 
     MembershipList? userTeamList;
-    String userTeamId = Appwrite.studentTeamId;
+    String userTeamId = TeamIds.studentTeamId;
 
     for (var teamId in teamIds) {
       try {
@@ -41,9 +41,9 @@ class AuthRemoteRepository {
     }
 
     final userModel = UserModel.fromAppwrite(user);
-    userModel.position = userTeamId == Appwrite.adminTeamId
+    userModel.position = userTeamId == TeamIds.adminTeamId
         ? Position.admin
-        : userTeamId == Appwrite.coordinatorTeamId
+        : userTeamId == TeamIds.coordinatorTeamId
             ? Position.coordinator
             : Position.student;
 
@@ -63,9 +63,9 @@ class AuthRemoteRepository {
       final user = await Appwrite.account.get();
 
       final teamIds = [
-        Appwrite.adminTeamId,
-        Appwrite.coordinatorTeamId,
-        Appwrite.studentTeamId
+        TeamIds.adminTeamId,
+        TeamIds.coordinatorTeamId,
+        TeamIds.studentTeamId
       ];
 
       MembershipList? userTeamList;
@@ -87,9 +87,9 @@ class AuthRemoteRepository {
       }
 
       final userModel = UserModel.fromAppwrite(user);
-      userModel.position = userTeamId == Appwrite.adminTeamId
+      userModel.position = userTeamId == TeamIds.adminTeamId
           ? Position.admin
-          : userTeamId == Appwrite.coordinatorTeamId
+          : userTeamId == TeamIds.coordinatorTeamId
               ? Position.coordinator
               : Position.student;
 
@@ -116,18 +116,18 @@ class AuthRemoteRepository {
       );
 
       await Appwrite.functions.createExecution(
-          functionId: Appwrite.addUserToTeam,
+          functionId: FunctionIds.addUserToTeam,
           body: json.encode({
             "userId": user.$id,
-            "teamId": Appwrite.studentTeamId,
+            "teamId": TeamIds.studentTeamId,
           }));
 
       final userModel =
           UserModel.fromAppwrite(user).copyWith(phoneNumber: phoneNumber);
 
       await Appwrite.databases.createDocument(
-          databaseId: Appwrite.crcDatabase,
-          collectionId: Appwrite.usersCollection,
+          databaseId: DatabaseIds.crcDatabase,
+          collectionId: CollectionsIds.usersCollection,
           documentId: user.$id,
           data: userModel.toMap());
 

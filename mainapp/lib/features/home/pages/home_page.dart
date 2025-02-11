@@ -7,6 +7,7 @@ import 'package:mainapp/constants/constants.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
 import 'package:mainapp/features/companies/pages/create_new_company.dart';
 import 'package:mainapp/features/configurations/pages/change_configuration.dart';
+import 'package:mainapp/features/forms/page/form_pages.dart';
 import 'package:mainapp/features/home/pages/tabs/tabs.dart';
 
 import '../../../custom/widgets/custom_global_widgets.dart';
@@ -36,7 +37,8 @@ class _HomePageState extends State<HomePage> {
                       children: [
                           CustomFABChild(
                               label: 'Create New Form',
-                              onTap: () {},
+                              onTap: () => Navigator.of(context)
+                                  .push(CreateFormPage.route()),
                               icon: Icon(Icons.description)),
                           CustomFABChild(
                               label: 'Create Update',

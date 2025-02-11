@@ -83,7 +83,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   const SizedBox(height: 80),
                   CustomFormField(
-                    courseController: nameController,
+                    controller: nameController,
                     obscureText: false,
                     textInputType: TextInputType.text,
                     labelText: 'Name',
@@ -91,7 +91,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   SizedBox(height: 10),
                   CustomFormField(
-                    courseController: nameController,
+                    controller: emailController,
                     obscureText: false,
                     textInputType: TextInputType.emailAddress,
                     labelText: 'E-mail',
@@ -99,7 +99,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   SizedBox(height: 10),
                   CustomFormField(
-                    courseController: nameController,
+                    controller: phoneController,
                     obscureText: false,
                     textInputType: TextInputType.phone,
                     labelText: 'Phone Number',
@@ -107,11 +107,11 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   SizedBox(height: 10),
                   CustomFormField(
-                    courseController: nameController,
-                    obscureText: false,
+                    controller: passwordController,
+                    obscureText: true,
                     textInputType: TextInputType.text,
                     labelText: 'Password',
-                    validator: nameValidator,
+                    validator: passwordValidator,
                   ),
                   SizedBox(height: 80),
                   ElevatedButton(

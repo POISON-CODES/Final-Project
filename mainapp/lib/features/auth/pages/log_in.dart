@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mainapp/core/utils/utils.dart';
+import 'package:mainapp/custom/widgets/custom_global_widgets.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
 import 'package:mainapp/features/auth/pages/sign_up.dart';
 import 'package:mainapp/features/home/pages/home_page.dart';
@@ -72,21 +73,17 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 80),
-                  TextFormField(
+                  CustomFormField(
                     controller: emailController,
+                    labelText: "Email ID",
                     validator: emailValidator,
-                    decoration: InputDecoration(
-                      hintText: "Email ID",
-                    ),
                   ),
                   SizedBox(height: 10),
-                  TextFormField(
+                  CustomFormField(
                     controller: passwordController,
-                    obscureText: true,
+                    labelText: "Passowrd",
                     validator: passwordValidator,
-                    decoration: InputDecoration(
-                      hintText: "Password",
-                    ),
+                    obscureText: true,
                   ),
                   SizedBox(height: 80),
                   ElevatedButton(

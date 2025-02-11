@@ -15,8 +15,8 @@ class ConfigurationRepository {
   }) async {
     try {
       Document doc = await Appwrite.databases.createDocument(
-          databaseId: Appwrite.crcDatabase,
-          collectionId: Appwrite.constantsCollection,
+          databaseId: DatabaseIds.crcDatabase,
+          collectionId: CollectionsIds.batchConfigsCollection,
           documentId: ID.unique(),
           data: {
             'department': department,

@@ -1,7 +1,9 @@
 part of 'custom_global_widgets.dart';
 
-class CustomFormField extends StatefulWidget {
-  final TextEditingController courseController;
+
+
+class CustomFormField extends FormFields {
+  final TextEditingController controller;
   final bool obscureText;
   final TextInputType textInputType;
   final String labelText;
@@ -11,10 +13,10 @@ class CustomFormField extends StatefulWidget {
     super.key,
     this.obscureText = false,
     this.textInputType = TextInputType.text,
-    required this.courseController,
+    required this.controller,
     required this.labelText,
     this.validator,
-  });
+  }) : super();
 
   @override
   State<CustomFormField> createState() => _CustomFormFieldState();
@@ -36,7 +38,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
       keyboardAppearance: Brightness.dark,
       obscuringCharacter: '*',
       keyboardType: widget.textInputType,
-      controller: widget.courseController,
+      controller: widget.controller,
       onTapOutside: (_) => FocusScope.of(context).unfocus(),
       obscureText: _obscureText,
       decoration: InputDecoration(
@@ -52,7 +54,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
                 ),
               )
             : null, // Hide the suffix icon if obscureText is false
-        label: Text(" ${widget.labelText} "),
+        labelText: widget.labelText, // Removed unnecessary space
         labelStyle: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.grey,

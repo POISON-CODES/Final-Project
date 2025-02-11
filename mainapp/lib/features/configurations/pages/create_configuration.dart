@@ -102,7 +102,7 @@ class _CreateConfigurationState extends State<CreateConfiguration> {
                         height: 10,
                       ),
                       CustomFormField(
-                        courseController: _courseController,
+                        controller: _courseController,
                         obscureText: false,
                         textInputType: TextInputType.text,
                         labelText: 'Course',
@@ -112,7 +112,7 @@ class _CreateConfigurationState extends State<CreateConfiguration> {
                         height: 10,
                       ),
                       CustomFormField(
-                        courseController: _specializationController,
+                        controller: _specializationController,
                         obscureText: false,
                         textInputType: TextInputType.text,
                         labelText: 'Specialization',
@@ -122,7 +122,7 @@ class _CreateConfigurationState extends State<CreateConfiguration> {
                         height: 10,
                       ),
                       CustomFormField(
-                        courseController: _courseCodeController,
+                        controller: _courseCodeController,
                         obscureText: false,
                         textInputType: TextInputType.text,
                         labelText: 'Course Code',
@@ -132,7 +132,7 @@ class _CreateConfigurationState extends State<CreateConfiguration> {
                         height: 10,
                       ),
                       CustomFormField(
-                        courseController: _hoiController,
+                        controller: _hoiController,
                         obscureText: false,
                         textInputType: TextInputType.text,
                         labelText: 'HOI',
@@ -142,7 +142,7 @@ class _CreateConfigurationState extends State<CreateConfiguration> {
                         height: 10,
                       ),
                       CustomFormField(
-                        courseController: _facultyCoordinatorController,
+                        controller: _facultyCoordinatorController,
                         obscureText: false,
                         textInputType: TextInputType.text,
                         labelText: 'Faculty Co-ordinator',

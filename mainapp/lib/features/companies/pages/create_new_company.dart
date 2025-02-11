@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mainapp/custom/widgets/custom_global_widgets.dart';
 
 class CreateNewCompanyPage extends StatefulWidget {
   static MaterialPageRoute route() =>
@@ -63,24 +64,20 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
           ),
         ),
       ),
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text("Create Company"),
-        actions: [
-          PopupMenuButton(
-            itemBuilder: (context) {
-              return {'LogOut', 'Settings'}.map(
-                (String choice) {
-                  return PopupMenuItem(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                },
-              ).toList();
-            },
-          )
-        ],
-      ),
+      appBar: CustomAppBar(title: "Create Company", actions: [
+        PopupMenuButton(
+          itemBuilder: (context) {
+            return {'LogOut', 'Settings'}.map(
+              (String choice) {
+                return PopupMenuItem(
+                  value: choice,
+                  child: Text(choice),
+                );
+              },
+            ).toList();
+          },
+        ),
+      ]),
     );
   }
 }
