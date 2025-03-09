@@ -14,41 +14,20 @@ class FileUploadField extends FormFields {
 }
 
 class _FileUploadFieldState extends State<FileUploadField> {
-  List<String> _selectedFileNames = [];
-
   Future<void> _pickFiles() async {
-    // Request permissions
-    PermissionStatus mediaAccessStatus =
-        await Permission.accessMediaLocation.request();
-        await Permission.photos.request();
-        await Permission.videos.request();
-        await Permission.audio.request();
-    PermissionStatus manageExternalStorageStatus =
-        await Permission.manageExternalStorage.request();
-    PermissionStatus storageAccessStatus = await Permission.storage.request();
-
-    if (manageExternalStorageStatus.isGranted &&
-        mediaAccessStatus.isGranted &&
-        storageAccessStatus.isGranted) {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        allowMultiple: widget.count > 1,
+    try {
+      var _selectedFiles = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'doc', 'docx'],
       );
-
-      if (result != null) {
-        setState(() {
-          _selectedFileNames =
-              result.files.map((file) => file.name).take(widget.count).toList();
-        });
-      }
-    } else {
-      // Handle the case when permission is not granted
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              'Storage and media location permissions are required to pick files.'),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
+      List<PlatformFile> listfiles = _selectedFiles!.files.toList();
+      listfiles.forEach((platformfile) {
+        platformfile.extension;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
@@ -81,15 +60,6 @@ class _FileUploadFieldState extends State<FileUploadField> {
             ],
           ),
         ),
-        if (_selectedFileNames.isNotEmpty) ...[
-          SizedBox(height: 5),
-          ..._selectedFileNames.map((fileName) => Text(
-                fileName,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-              )),
-        ],
       ],
     );
   }

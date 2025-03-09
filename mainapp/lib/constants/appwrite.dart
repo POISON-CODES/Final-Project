@@ -1,7 +1,8 @@
 part of 'constants.dart';
 
 class Appwrite {
-  static String projectEndPoint = 'https://10.5.127.42/v1';
+  // static String projectEndPoint = 'https://10.5.127.42/v1';
+  static String projectEndPoint = 'https://10.0.0.33/v1';
   static String projectName = '67a351b601aca4ed39db';
 
   static final Client client = Client()
@@ -33,4 +34,8 @@ class CollectionsIds {
 
 class FunctionIds {
   static final String addUserToTeam = '67a352b30004ab7b74ed';
+}
+
+class Buckets {
+  static final String defaultResumeBucket = '67a86ff6000fcf767ea0';
 }
