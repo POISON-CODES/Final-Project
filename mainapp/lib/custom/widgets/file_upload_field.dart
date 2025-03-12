@@ -14,6 +14,7 @@ class FileUploadField extends FormFields {
 }
 
 class _FileUploadFieldState extends State<FileUploadField> {
+  List<CustomFile>? listFiles;
   Future<void> _pickFiles() async {
     try {
       var _selectedFiles = await FilePicker.platform.pickFiles(
@@ -21,41 +22,69 @@ class _FileUploadFieldState extends State<FileUploadField> {
         type: FileType.custom,
         allowedExtensions: ['pdf', 'doc', 'docx'],
       );
-      List<PlatformFile> listfiles = _selectedFiles!.files.toList();
-      listfiles.forEach((platformfile) {
-        platformfile.extension;
-      });
+      listFiles = _selectedFiles!.files
+          .map((e) => CustomFile.fromPlatformFile(e))
+          .toList();
+      setState(() {});
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
+  TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    _controller.text = "Select ${widget.count} files";
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
+            border: Border.all(
+              color: Colors.grey.shade300,
+              width: 3,
+            ),
             borderRadius: BorderRadius.circular(10),
           ),
+          padding: EdgeInsets.all(20),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                widget.label,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "${widget.label} : Select ${widget.count} files",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: _pickFiles,
+                    child: Icon(
+                      Icons.upload,
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 10),
-              ElevatedButton.icon(
-                onPressed: _pickFiles,
-                icon: Icon(Icons.upload),
-                label: Text("Upload Files"),
+              Text(
+                listFiles!
+                    .map((e) => e.name.length > 30
+                        ? '${e.name.trim().substring(0, 30)}...'
+                        : e.name)
+                    .join("\n "),
               ),
             ],
           ),

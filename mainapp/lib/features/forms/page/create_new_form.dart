@@ -12,7 +12,7 @@ class CreateFormPage extends StatefulWidget {
 class _CreateFormPageState extends State<CreateFormPage> {
   TextEditingController _companyNameController = TextEditingController();
   List<FormFields> _formList = [];
-  List<dynamic> _valuesList = [];
+  List<dynamic> _controllersList = [];
 
   void _showTextFieldDialog() {
     TextEditingController _newFieldController = TextEditingController();
@@ -36,7 +36,7 @@ class _CreateFormPageState extends State<CreateFormPage> {
               child: Text("Add"),
               onPressed: () {
                 setState(() {
-                  _valuesList.add(_newFieldController);
+                  _controllersList.add(_newFieldController);
                   _formList.add(CustomFormField(
                     controller: _newFieldController,
                     labelText: _newFieldController.text,
@@ -192,7 +192,7 @@ class _CreateFormPageState extends State<CreateFormPage> {
               child: Text("Add"),
               onPressed: () {
                 setState(() {
-                  _valuesList.add(_newFieldController);
+                  _controllersList.add(_newFieldController);
                   _formList.add(FileUploadField(
                     label: _newFieldController.text,
                     count: _fileCountController.text.isNotEmpty
@@ -208,6 +208,8 @@ class _CreateFormPageState extends State<CreateFormPage> {
       },
     );
   }
+
+  void _createForm() {}
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +233,15 @@ class _CreateFormPageState extends State<CreateFormPage> {
           ],
         )),
       ),
-      appBar: CustomAppBar(title: "Create Form"),
+      appBar: CustomAppBar(
+        title: "Create Form",
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(onPressed: () {}, icon: Icon(Icons.check)),
+          )
+        ],
+      ),
       floatingActionButton: customFloatingActionButton(
         context: context,
         children: [

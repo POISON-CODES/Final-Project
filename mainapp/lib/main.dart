@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
-Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
@@ -36,6 +36,13 @@ Widget build(BuildContext context) {
         inputDecorationTheme: InputDecorationTheme(
           contentPadding: const EdgeInsets.all(20),
           enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.grey.shade300,
+              width: 3,
+            ),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          disabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
               color: Colors.grey.shade300,
               width: 3,
