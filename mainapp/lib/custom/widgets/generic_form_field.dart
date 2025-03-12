@@ -6,9 +6,9 @@ class CustomFormField extends FormFields {
   final TextEditingController controller;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
-  late bool obscure;
+  final bool obscure;
 
-  CustomFormField({
+  const CustomFormField({
     super.key,
     super.obscureText = false,
     super.textInputType = TextInputType.text,
