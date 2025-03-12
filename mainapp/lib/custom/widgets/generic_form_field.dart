@@ -4,23 +4,22 @@ part of 'custom_global_widgets.dart';
 
 class CustomFormField extends FormFields {
   final TextEditingController controller;
-  final bool obscureText;
-  final TextInputType textInputType;
-  final String labelText;
-  final bool enabled;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
+  late bool obscure;
 
-  const CustomFormField({
+  CustomFormField({
     super.key,
-    this.obscureText = false,
-    this.textInputType = TextInputType.text,
-    this.enabled = true,
+    super.obscureText = false,
+    super.textInputType = TextInputType.text,
+    super.enabled = true,
     this.suffixIcon,
-    required this.controller,
-    required this.labelText,
     this.validator,
-  }) : super();
+    super.fieldType = FieldType.text,
+    super.isRequired = true,
+    required this.controller,
+    required super.label,
+  }) : obscure = obscureText ?? false;
 
   @override
   State<CustomFormField> createState() => _CustomFormFieldState();
@@ -29,7 +28,7 @@ class CustomFormField extends FormFields {
     return <String, dynamic>{
       'obscureText': obscureText,
       'textInputType': textInputType.toString(),
-      'labelText': labelText,
+      'labelText': label,
       'enabled': enabled,
       'suffixIcon': suffixIcon?.toString(),
       'validator': validator?.toString(),
@@ -59,7 +58,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
   @override
   void initState() {
     super.initState();
-    _obscureText = widget.obscureText;
+    _obscureText = widget.obscureText!;
   }
 
   @override
@@ -77,7 +76,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 8.0),
           child: widget.suffixIcon ??
-              (widget.obscureText
+              (widget.obscure
                   ? IconButton(
                       onPressed: () {
                         setState(() {
@@ -90,7 +89,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
                     )
                   : null),
         ), // Hide the suffix icon if obscureText is false
-        labelText: widget.labelText, // Removed unnecessary space
+        labelText: widget.label, // Removed unnecessary space
         labelStyle: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.grey,

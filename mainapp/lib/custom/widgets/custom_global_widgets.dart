@@ -5,7 +5,7 @@ import 'package:mainapp/models/models.dart';
 
 part 'app_bar.dart';
 part 'dropdownbutton.dart';
+part 'form_fields.dart';
 part 'floating_action_button.dart';
 part 'generic_form_field.dart';
-part 'form_fields.dart';
 part 'file_upload_field.dart';

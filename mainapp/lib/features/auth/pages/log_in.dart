@@ -75,13 +75,13 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 80),
                   CustomFormField(
                     controller: emailController,
-                    labelText: "Email ID",
+                    label: "Email ID",
                     validator: emailValidator,
                   ),
                   SizedBox(height: 10),
                   CustomFormField(
                     controller: passwordController,
-                    labelText: "Passowrd",
+                    label: "Passowrd",
                     validator: passwordValidator,
                     obscureText: true,
                   ),

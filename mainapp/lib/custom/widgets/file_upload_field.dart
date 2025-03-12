@@ -1,12 +1,12 @@
 part of 'custom_global_widgets.dart';
 
 class FileUploadField extends FormFields {
-  final String label;
-  final int count;
   const FileUploadField({
     super.key,
-    required this.label,
-    required this.count,
+    super.fieldType = FieldType.file,
+    super.isRequired = true,
+    required super.label,
+    required super.fileCount,
   });
 
   @override
@@ -42,7 +42,7 @@ class _FileUploadFieldState extends State<FileUploadField> {
 
   @override
   Widget build(BuildContext context) {
-    _controller.text = "Select ${widget.count} files";
+    _controller.text = "Select ${widget.fileCount} files";
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -63,7 +63,7 @@ class _FileUploadFieldState extends State<FileUploadField> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "${widget.label} : Select ${widget.count} files",
+                    "${widget.label} : Select ${widget.fileCount} files",
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

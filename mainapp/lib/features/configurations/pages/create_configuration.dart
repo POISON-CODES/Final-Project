@@ -90,7 +90,7 @@ class _CreateConfigurationState extends State<CreateConfiguration> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CustomDropDown(
-                        itemsList: _departments,
+                        dropDownItemsList: _departments,
                         onChanged: (val) {
                           setState(() {
                             _department = val;
@@ -105,7 +105,7 @@ class _CreateConfigurationState extends State<CreateConfiguration> {
                         controller: _courseController,
                         obscureText: false,
                         textInputType: TextInputType.text,
-                        labelText: 'Course',
+                        label: 'Course',
                         validator: null,
                       ),
                       SizedBox(
@@ -115,7 +115,7 @@ class _CreateConfigurationState extends State<CreateConfiguration> {
                         controller: _specializationController,
                         obscureText: false,
                         textInputType: TextInputType.text,
-                        labelText: 'Specialization',
+                        label: 'Specialization',
                         validator: null,
                       ),
                       SizedBox(
@@ -125,7 +125,7 @@ class _CreateConfigurationState extends State<CreateConfiguration> {
                         controller: _courseCodeController,
                         obscureText: false,
                         textInputType: TextInputType.text,
-                        labelText: 'Course Code',
+                        label: 'Course Code',
                         validator: null,
                       ),
                       SizedBox(
@@ -135,7 +135,7 @@ class _CreateConfigurationState extends State<CreateConfiguration> {
                         controller: _hoiController,
                         obscureText: false,
                         textInputType: TextInputType.text,
-                        labelText: 'HOI',
+                        label: 'HOI',
                         validator: null,
                       ),
                       SizedBox(
@@ -145,14 +145,14 @@ class _CreateConfigurationState extends State<CreateConfiguration> {
                         controller: _facultyCoordinatorController,
                         obscureText: false,
                         textInputType: TextInputType.text,
-                        labelText: 'Faculty Co-ordinator',
+                        label: 'Faculty Co-ordinator',
                         validator: null,
                       ),
                       SizedBox(
                         height: 10,
                       ),
                       CustomDropDown(
-                        itemsList: _graduationStatuses,
+                        dropDownItemsList: _graduationStatuses,
                         onChanged: (val) {
                           setState(() {
                             _graduationStatus = val;

@@ -1,15 +1,15 @@
 part of 'custom_global_widgets.dart';
 
 class CustomDropDown extends FormFields {
-  final List<String> itemsList;
   final void Function(String?) onChanged;
-  final String label;
 
   const CustomDropDown({
     super.key,
-    required this.itemsList,
+    super.fieldType = FieldType.dropdown,
+    super.isRequired = false,
+    required super.label,
+    required super.dropDownItemsList,
     required this.onChanged,
-    required this.label,
   });
 
   @override
@@ -31,7 +31,7 @@ class _CustomDropDownState extends State<CustomDropDown> {
           color: Colors.grey,
         ),
       ),
-      items: widget.itemsList
+      items: widget.dropDownItemsList!
           .map(
             (val) => DropdownMenuItem(
               value: val,

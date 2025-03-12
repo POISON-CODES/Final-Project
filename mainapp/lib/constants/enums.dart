@@ -4,6 +4,8 @@ enum Position { admin, coordinator, student }
 
 enum Priority { low, medium, high }
 
+enum FieldType { text, file, dropDown, multiSelect }
+
 enum Department {
   abs,
   aiit,

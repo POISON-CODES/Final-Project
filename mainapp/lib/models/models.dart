@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:io' as io;
 import 'package:appwrite/models.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:mainapp/constants/constants.dart';
 import 'package:collection/collection.dart';
 
 part 'company_model.dart';
+part 'form_field_model.dart';
 part 'configuration_model.dart';
 part 'form_model.dart';
 part 'update_model.dart';

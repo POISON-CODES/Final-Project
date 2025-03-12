@@ -39,7 +39,7 @@ class _CreateFormPageState extends State<CreateFormPage> {
                   _controllersList.add(_newFieldController);
                   _formList.add(CustomFormField(
                     controller: _newFieldController,
-                    labelText: _newFieldController.text,
+                    label: _newFieldController.text,
                   ));
                 });
                 Navigator.of(context).pop();
@@ -129,7 +129,7 @@ class _CreateFormPageState extends State<CreateFormPage> {
                               setState(() {
                                 _formList.add(
                                   CustomDropDown(
-                                    itemsList: dropdownItems,
+                                    dropDownItemsList: dropdownItems,
                                     onChanged: (String? newValue) {
                                       _newFieldController.text = newValue ?? '';
                                     },
@@ -195,7 +195,7 @@ class _CreateFormPageState extends State<CreateFormPage> {
                   _controllersList.add(_newFieldController);
                   _formList.add(FileUploadField(
                     label: _newFieldController.text,
-                    count: _fileCountController.text.isNotEmpty
+                    fileCount: _fileCountController.text.isNotEmpty
                         ? int.parse(_fileCountController.text)
                         : 1,
                   ));
@@ -209,7 +209,42 @@ class _CreateFormPageState extends State<CreateFormPage> {
     );
   }
 
-  void _createForm() {}
+  void _createForm() {
+    if (_companyNameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Form title cannot be empty")),
+      );
+      return;
+    }
+
+    List<FormFieldModel> formFields = _formList.map((field) {
+      return FormFieldModel(
+        label: field.label, // Assuming label is stored in _formList
+        fieldType: field.fieldType, // Assuming fieldType is stored in _formList
+        obscureText: field.obscureText,
+        textInputType: field.textInputType,
+        enabled: field.enabled,
+        dropDownItemsList: field.dropDownItemsList,
+        fileCount: field.fileCount,
+        isRequired: field.isRequired,
+      );
+    }).toList();
+
+    // Convert to JSON for storage
+    Map<String, dynamic> formJson = {
+      "id": "form_${DateTime.now().millisecondsSinceEpoch}",
+      "title": _companyNameController.text,
+      "fields": formFields.map((e) => e.toMap()).toList(),
+      "createdAt": DateTime.now().toIso8601String(),
+    };
+
+    print(jsonEncode(formJson)); // Replace with actual database storage logic
+
+    // Show success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Form Created Successfully!")),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +255,9 @@ class _CreateFormPageState extends State<CreateFormPage> {
             child: Column(
           children: [
             CustomFormField(
-                controller: _companyNameController, labelText: "Company Name"),
+              controller: _companyNameController,
+              label: "Company Name",
+            ),
             SizedBox(
               height: 10,
             ),
@@ -238,7 +275,10 @@ class _CreateFormPageState extends State<CreateFormPage> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
-            child: IconButton(onPressed: () {}, icon: Icon(Icons.check)),
+            child: IconButton(
+              onPressed: _createForm,
+              icon: Icon(Icons.check),
+            ),
           )
         ],
       ),
