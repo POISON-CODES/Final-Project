@@ -15,6 +15,7 @@ class FileUploadField extends FormFields {
 
 class _FileUploadFieldState extends State<FileUploadField> {
   List<CustomFile>? listFiles;
+
   Future<void> _pickFiles() async {
     try {
       var _selectedFiles = await FilePicker.platform.pickFiles(
@@ -22,27 +23,32 @@ class _FileUploadFieldState extends State<FileUploadField> {
         type: FileType.custom,
         allowedExtensions: ['pdf', 'doc', 'docx'],
       );
-      listFiles = _selectedFiles!.files
-          .map((e) => CustomFile.fromPlatformFile(e))
-          .toList();
-      setState(() {});
+
+      if (_selectedFiles != null) {
+        setState(() {
+          listFiles = _selectedFiles.files
+              .map((e) => CustomFile.fromPlatformFile(e))
+              .toList();
+        });
+      }
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void dispose() {
-    super.dispose();
     _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     _controller.text = "Select ${widget.fileCount} files";
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -55,7 +61,7 @@ class _FileUploadFieldState extends State<FileUploadField> {
             ),
             borderRadius: BorderRadius.circular(10),
           ),
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -80,11 +86,13 @@ class _FileUploadFieldState extends State<FileUploadField> {
                 ],
               ),
               Text(
-                listFiles!
-                    .map((e) => e.name.length > 30
-                        ? '${e.name.trim().substring(0, 30)}...'
-                        : e.name)
-                    .join("\n "),
+                listFiles != null && listFiles!.isNotEmpty
+                    ? listFiles!
+                        .map((e) => e.name.length > 30
+                            ? '${e.name.trim().substring(0, 30)}...'
+                            : e.name)
+                        .join("\n ")
+                    : "", // Display empty string if listFiles is null or empty
               ),
             ],
           ),

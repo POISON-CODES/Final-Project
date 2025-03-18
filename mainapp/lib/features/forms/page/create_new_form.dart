@@ -10,19 +10,27 @@ class CreateFormPage extends StatefulWidget {
 }
 
 class _CreateFormPageState extends State<CreateFormPage> {
-  TextEditingController _companyNameController = TextEditingController();
-  List<FormFields> _formList = [];
-  List<dynamic> _controllersList = [];
+  final TextEditingController _titleController =
+      TextEditingController(text: "Untitled Form");
+
+  final List<FormFields> _formList = [];
+  final List<dynamic> _controllersList = [];
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
+  }
 
   void _showTextFieldDialog() {
-    TextEditingController _newFieldController = TextEditingController();
+    TextEditingController newFieldController = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Add New Field"),
           content: TextField(
-            controller: _newFieldController,
+            controller: newFieldController,
             decoration: InputDecoration(labelText: "Field Name"),
           ),
           actions: [
@@ -36,11 +44,12 @@ class _CreateFormPageState extends State<CreateFormPage> {
               child: Text("Add"),
               onPressed: () {
                 setState(() {
-                  _controllersList.add(_newFieldController);
+                  _controllersList.add(newFieldController);
                   _formList.add(CustomFormField(
-                    controller: _newFieldController,
-                    label: _newFieldController.text,
+                    controller: newFieldController,
+                    label: newFieldController.text,
                   ));
+                  newFieldController.text = '';
                 });
                 Navigator.of(context).pop();
               },
@@ -52,8 +61,8 @@ class _CreateFormPageState extends State<CreateFormPage> {
   }
 
   void _showDropdownFieldDialog() {
-    TextEditingController _newFieldController = TextEditingController();
-    TextEditingController _optionController = TextEditingController();
+    TextEditingController newFieldController = TextEditingController();
+    TextEditingController optionController = TextEditingController();
     List<String> dropdownItems = [];
 
     showDialog(
@@ -76,21 +85,21 @@ class _CreateFormPageState extends State<CreateFormPage> {
                     ),
                     SizedBox(height: 10),
                     TextField(
-                      controller: _newFieldController,
+                      controller: newFieldController,
                       decoration: InputDecoration(labelText: "Field Name"),
                     ),
                     SizedBox(height: 10),
                     TextField(
-                      controller: _optionController,
+                      controller: optionController,
                       decoration: InputDecoration(labelText: "Add Option"),
                     ),
                     SizedBox(height: 5),
                     ElevatedButton(
                       onPressed: () {
-                        if (_optionController.text.isNotEmpty) {
+                        if (optionController.text.isNotEmpty) {
                           setDialogState(() {
-                            dropdownItems.add(_optionController.text);
-                            _optionController.clear();
+                            dropdownItems.add(optionController.text);
+                            optionController.clear();
                           });
                         }
                       },
@@ -124,16 +133,16 @@ class _CreateFormPageState extends State<CreateFormPage> {
                         TextButton(
                           child: Text("Add"),
                           onPressed: () {
-                            if (_newFieldController.text.isNotEmpty &&
+                            if (newFieldController.text.isNotEmpty &&
                                 dropdownItems.isNotEmpty) {
                               setState(() {
                                 _formList.add(
                                   CustomDropDown(
                                     dropDownItemsList: dropdownItems,
                                     onChanged: (String? newValue) {
-                                      _newFieldController.text = newValue ?? '';
+                                      newFieldController.text = newValue ?? '';
                                     },
-                                    label: _newFieldController.text,
+                                    label: newFieldController.text,
                                   ),
                                 );
                               });
@@ -154,8 +163,8 @@ class _CreateFormPageState extends State<CreateFormPage> {
   }
 
   void _showFileUploadDialog() {
-    TextEditingController _newFieldController = TextEditingController();
-    TextEditingController _fileCountController = TextEditingController();
+    TextEditingController newFieldController = TextEditingController();
+    TextEditingController fileCountController = TextEditingController();
 
     showDialog(
       context: context,
@@ -166,14 +175,14 @@ class _CreateFormPageState extends State<CreateFormPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: _newFieldController,
+                controller: newFieldController,
                 decoration: InputDecoration(labelText: "Field Name"),
               ),
               SizedBox(
                 height: 10,
               ),
               TextField(
-                controller: _fileCountController,
+                controller: fileCountController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: "Number of Files",
@@ -192,11 +201,11 @@ class _CreateFormPageState extends State<CreateFormPage> {
               child: Text("Add"),
               onPressed: () {
                 setState(() {
-                  _controllersList.add(_newFieldController);
+                  _controllersList.add(newFieldController);
                   _formList.add(FileUploadField(
-                    label: _newFieldController.text,
-                    fileCount: _fileCountController.text.isNotEmpty
-                        ? int.parse(_fileCountController.text)
+                    label: newFieldController.text,
+                    fileCount: fileCountController.text.isNotEmpty
+                        ? int.parse(fileCountController.text)
                         : 1,
                   ));
                 });
@@ -210,13 +219,6 @@ class _CreateFormPageState extends State<CreateFormPage> {
   }
 
   void _createForm() {
-    if (_companyNameController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Form title cannot be empty")),
-      );
-      return;
-    }
-
     List<FormFieldModel> formFields = _formList.map((field) {
       return FormFieldModel(
         label: field.label, // Assuming label is stored in _formList
@@ -233,17 +235,14 @@ class _CreateFormPageState extends State<CreateFormPage> {
     // Convert to JSON for storage
     Map<String, dynamic> formJson = {
       "id": "form_${DateTime.now().millisecondsSinceEpoch}",
-      "title": _companyNameController.text,
+      "titl": _titleController.text.isEmpty
+          ? "Untitled Form"
+          : _titleController.text,
       "fields": formFields.map((e) => e.toMap()).toList(),
       "createdAt": DateTime.now().toIso8601String(),
     };
-
-    print(jsonEncode(formJson)); // Replace with actual database storage logic
-
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Form Created Successfully!")),
-    );
+    context.read<FormCubit>().createForm
+    
   }
 
   @override
@@ -255,12 +254,10 @@ class _CreateFormPageState extends State<CreateFormPage> {
             child: Column(
           children: [
             CustomFormField(
-              controller: _companyNameController,
-              label: "Company Name",
+              controller: _titleController,
+              label: "Form Title",
             ),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
             ..._formList.map((field) => Column(
                   children: [
                     field,

@@ -120,6 +120,7 @@ class AuthRemoteRepository {
           body: json.encode({
             "userId": user.$id,
             "teamId": TeamIds.studentTeamId,
+            "email": email,
           }));
 
       final userModel =

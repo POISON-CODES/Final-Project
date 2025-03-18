@@ -18,6 +18,7 @@ class Appwrite {
 
 class DatabaseIds {
   static final String crcDatabase = '67a5a03a000bf36ee5a9';
+  static final String formsDatabase = '67d9185800377484f0f4';
 }
 
 class TeamIds {
@@ -34,6 +35,7 @@ class CollectionsIds {
 
 class FunctionIds {
   static final String addUserToTeam = '67a352b30004ab7b74ed';
+  static final String createForm = '67a8b2be002191ea0564';
 }
 
 class Buckets {

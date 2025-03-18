@@ -6,7 +6,7 @@ class CustomDropDown extends FormFields {
   const CustomDropDown({
     super.key,
     super.fieldType = FieldType.dropdown,
-    super.isRequired = false,
+    super.isRequired = true,
     required super.label,
     required super.dropDownItemsList,
     required this.onChanged,
