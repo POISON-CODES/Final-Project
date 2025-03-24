@@ -2,6 +2,7 @@ part of 'custom_global_widgets.dart';
 
 class CustomDropDown extends FormFields {
   final void Function(String?) onChanged;
+  final String? initialValue;
 
   const CustomDropDown({
     super.key,
@@ -10,6 +11,7 @@ class CustomDropDown extends FormFields {
     required super.label,
     required super.dropDownItemsList,
     required this.onChanged,
+    this.initialValue,
   });
 
   @override
@@ -21,6 +23,7 @@ class _CustomDropDownState extends State<CustomDropDown> {
   Widget build(BuildContext context) {
     return DropdownButtonFormField(
       menuMaxHeight: 400,
+      value: widget.initialValue,
       decoration: InputDecoration(
         label: Text(" ${widget.label} "),
         labelStyle: TextStyle(

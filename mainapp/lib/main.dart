@@ -3,12 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
 import 'package:mainapp/features/auth/pages/sign_up.dart';
 import 'package:mainapp/features/configurations/cubit/configuration_cubit.dart';
+import 'package:mainapp/features/forms/cubit/form_cubit.dart';
 import 'package:mainapp/features/home/pages/home_page.dart';
 
 void main() {
   runApp(MultiBlocProvider(providers: [
     BlocProvider(create: (_) => AuthCubit()),
     BlocProvider(create: (_) => ConfigurationCubit()),
+    BlocProvider(create: (_) => FormCubit()),
   ], child: const MyApp()));
 }
 

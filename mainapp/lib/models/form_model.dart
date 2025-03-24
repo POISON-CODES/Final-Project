@@ -5,7 +5,7 @@ part of 'models.dart';
 class FormModel {
   final String id;
   final String name;
-  final List fields;
+  final String fields;
   final List responses;
   FormModel({
     required this.id,
@@ -17,7 +17,7 @@ class FormModel {
   FormModel copyWith({
     String? id,
     String? name,
-    List? fields,
+    String? fields,
     List? responses,
   }) {
     return FormModel(
@@ -41,12 +41,21 @@ class FormModel {
     return FormModel(
       id: map['id'] as String,
       name: map['name'] as String,
-      fields: List.from((map['fields'] as List)),
+      fields: map['fields'] as String,
       responses: List.from((map['responses'] as List)),
     );
   }
 
   String toJson() => json.encode(toMap());
+
+  factory FormModel.fromAppwrite(Document doc) {
+    return FormModel(
+      id: doc.$id,
+      name: doc.data['name'] as String,
+      fields: doc.data['fields'] as String,
+      responses: List.from(doc.data['responses'] as List),
+    );
+  }
 
   factory FormModel.fromJson(String source) =>
       FormModel.fromMap(json.decode(source) as Map<String, dynamic>);
@@ -63,7 +72,7 @@ class FormModel {
 
     return other.id == id &&
         other.name == name &&
-        listEquals(other.fields, fields) &&
+        other.fields == fields &&
         listEquals(other.responses, responses);
   }
 

@@ -18,6 +18,12 @@ class ConfigurationEdit extends ConfigurationState {
   ConfigurationEdit({required this.model});
 }
 
+class ConfigurationsLoaded extends ConfigurationState {
+  final List<ConfigurationModel> configurations;
+
+  ConfigurationsLoaded({required this.configurations});
+}
+
 class ConfigurationError extends ConfigurationState {
   final String error;
 

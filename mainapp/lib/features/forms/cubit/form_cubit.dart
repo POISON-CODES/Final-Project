@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mainapp/features/forms/repository/form_remote_repository.dart';
+import 'package:mainapp/models/models.dart';
 
 part 'form_state.dart';
 
@@ -9,15 +11,16 @@ class FormCubit extends Cubit<FormState> {
 
   void createForm({
     required String title,
-    required Map<String, dynamic> fields,
+    required String fields,
   }) async {
     try {
       emit(FormLoading());
-      await formRemoteRepository.createForm(
-        
+      FormModel form = await formRemoteRepository.createForm(
+        title: title,
+        fields: fields,
       );
 
-      emit(FormCreate());
+      emit(FormCreate(form));
     } catch (e) {
       emit(FormError(e.toString()));
     }

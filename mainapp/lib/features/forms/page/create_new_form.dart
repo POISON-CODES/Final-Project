@@ -28,20 +28,20 @@ class _CreateFormPageState extends State<CreateFormPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Add New Field"),
+          title: const Text("Add New Field"),
           content: TextField(
             controller: newFieldController,
-            decoration: InputDecoration(labelText: "Field Name"),
+            decoration: const InputDecoration(labelText: "Field Name"),
           ),
           actions: [
             TextButton(
-              child: Text("Cancel"),
+              child: const Text("Cancel"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text("Add"),
+              child: const Text("Add"),
               onPressed: () {
                 setState(() {
                   _controllersList.add(newFieldController);
@@ -69,31 +69,33 @@ class _CreateFormPageState extends State<CreateFormPage> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          insetPadding: EdgeInsets.all(10),
+          insetPadding: const EdgeInsets.all(10),
           child: StatefulBuilder(
             builder: (context, setDialogState) {
               return Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    const Text(
                       "Add New Dropdown Field",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     TextField(
                       controller: newFieldController,
-                      decoration: InputDecoration(labelText: "Field Name"),
+                      decoration:
+                          const InputDecoration(labelText: "Field Name"),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     TextField(
                       controller: optionController,
-                      decoration: InputDecoration(labelText: "Add Option"),
+                      decoration:
+                          const InputDecoration(labelText: "Add Option"),
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     ElevatedButton(
                       onPressed: () {
                         if (optionController.text.isNotEmpty) {
@@ -103,9 +105,9 @@ class _CreateFormPageState extends State<CreateFormPage> {
                           });
                         }
                       },
-                      child: Text("Add Option"),
+                      child: const Text("Add Option"),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Wrap(
                       children: dropdownItems
                           .map(
@@ -120,18 +122,18 @@ class _CreateFormPageState extends State<CreateFormPage> {
                           )
                           .toList(),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
-                          child: Text("Cancel"),
+                          child: const Text("Cancel"),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
                         ),
                         TextButton(
-                          child: Text("Add"),
+                          child: const Text("Add"),
                           onPressed: () {
                             if (newFieldController.text.isNotEmpty &&
                                 dropdownItems.isNotEmpty) {
@@ -170,21 +172,21 @@ class _CreateFormPageState extends State<CreateFormPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Add New Field"),
+          title: const Text("Add New Field"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: newFieldController,
-                decoration: InputDecoration(labelText: "Field Name"),
+                decoration: const InputDecoration(labelText: "Field Name"),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               TextField(
                 controller: fileCountController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Number of Files",
                 ),
               ),
@@ -192,13 +194,13 @@ class _CreateFormPageState extends State<CreateFormPage> {
           ),
           actions: [
             TextButton(
-              child: Text("Cancel"),
+              child: const Text("Cancel"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text("Add"),
+              child: const Text("Add"),
               onPressed: () {
                 setState(() {
                   _controllersList.add(newFieldController);
@@ -232,7 +234,6 @@ class _CreateFormPageState extends State<CreateFormPage> {
       );
     }).toList();
 
-    // Convert to JSON for storage
     Map<String, dynamic> formJson = {
       "id": "form_${DateTime.now().millisecondsSinceEpoch}",
       "titl": _titleController.text.isEmpty
@@ -241,76 +242,107 @@ class _CreateFormPageState extends State<CreateFormPage> {
       "fields": formFields.map((e) => e.toMap()).toList(),
       "createdAt": DateTime.now().toIso8601String(),
     };
-    context.read<FormCubit>().createForm
-    
+
+    context.read<form_cubit.FormCubit>().createForm(
+          title: _titleController.text,
+          fields: formJson.toString(),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-            child: Column(
-          children: [
-            CustomFormField(
-              controller: _titleController,
-              label: "Form Title",
+    return BlocConsumer<form_cubit.FormCubit, form_cubit.FormState>(
+      listener: (context, state) {
+        if (state is form_cubit.FormError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.error),
             ),
-            SizedBox(height: 10),
-            ..._formList.map((field) => Column(
-                  children: [
-                    field,
-                    SizedBox(height: 10),
-                  ],
-                )),
-          ],
-        )),
-      ),
-      appBar: CustomAppBar(
-        title: "Create Form",
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: IconButton(
-              onPressed: _createForm,
-              icon: Icon(Icons.check),
+          );
+        } else if (state is form_cubit.FormCreate) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Form created successfully!"),
             ),
-          )
-        ],
-      ),
-      floatingActionButton: customFloatingActionButton(
-        context: context,
-        children: [
-          CustomFABChild(
-            label: "TextField",
-            onTap: () {
-              _showTextFieldDialog();
-            },
-            icon: Icon(Icons.text_fields),
+          );
+          Navigator.pop(context);
+        }
+      },
+      builder: (context, state) {
+        if (state is form_cubit.FormLoading) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        return Scaffold(
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+                child: Column(
+              children: [
+                CustomFormField(
+                  controller: _titleController,
+                  label: "Form Title",
+                ),
+                const SizedBox(height: 10),
+                ..._formList.map((field) => Column(
+                      children: [
+                        field,
+                        const SizedBox(height: 10),
+                      ],
+                    )),
+              ],
+            )),
           ),
-          CustomFABChild(
-            label: "DropDown",
-            onTap: () {
-              _showDropdownFieldDialog();
-            },
-            icon: Icon(Icons.arrow_drop_down),
+          appBar: CustomAppBar(
+            title: "Create Form",
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: IconButton(
+                  onPressed: _createForm,
+                  icon: const Icon(Icons.check),
+                ),
+              )
+            ],
           ),
-          CustomFABChild(
-            label: "File Upload",
-            onTap: () {
-              _showFileUploadDialog();
-            },
-            icon: Icon(Icons.upload),
+          floatingActionButton: customFloatingActionButton(
+            context: context,
+            children: [
+              CustomFABChild(
+                label: "TextField",
+                onTap: () {
+                  _showTextFieldDialog();
+                },
+                icon: const Icon(Icons.text_fields),
+              ),
+              CustomFABChild(
+                label: "DropDown",
+                onTap: () {
+                  _showDropdownFieldDialog();
+                },
+                icon: const Icon(Icons.arrow_drop_down),
+              ),
+              CustomFABChild(
+                label: "File Upload",
+                onTap: () {
+                  _showFileUploadDialog();
+                },
+                icon: const Icon(Icons.upload),
+              ),
+              CustomFABChild(
+                label: "MultiSelect",
+                onTap: () {},
+                icon: const Icon(Icons.check_box),
+              ),
+            ],
+            mainIcon: Icons.add,
           ),
-          CustomFABChild(
-            label: "MultiSelect",
-            onTap: () {},
-            icon: Icon(Icons.check_box),
-          ),
-        ],
-        mainIcon: Icons.add,
-      ),
+        );
+      },
     );
   }
 }
