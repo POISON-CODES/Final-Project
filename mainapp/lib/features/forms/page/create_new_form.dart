@@ -166,32 +166,115 @@ class _CreateFormPageState extends State<CreateFormPage> {
 
   void _showFileUploadDialog() {
     TextEditingController newFieldController = TextEditingController();
-    TextEditingController fileCountController = TextEditingController();
+    TextEditingController fileCountController =
+        TextEditingController(text: "1");
+    List<String> allowedExtensions = ['pdf', 'doc', 'docx'];
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Add New Field"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: newFieldController,
-                decoration: const InputDecoration(labelText: "Field Name"),
+          content: StatefulBuilder(builder: (context, setDialogState) {
+            return Container(
+              width: double.infinity,
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.7,
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextField(
-                controller: fileCountController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: "Number of Files",
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: newFieldController,
+                      decoration:
+                          const InputDecoration(labelText: "Field Name"),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: fileCountController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: "Number of Files",
+                        hintText: "Enter 0 for unlimited files",
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        FilterChip(
+                          label: const Text('PDF'),
+                          selected: allowedExtensions.contains('pdf'),
+                          onSelected: (selected) {
+                            setDialogState(() {
+                              if (selected) {
+                                allowedExtensions.add('pdf');
+                              } else {
+                                allowedExtensions.remove('pdf');
+                              }
+                            });
+                          },
+                        ),
+                        FilterChip(
+                          label: const Text('DOC'),
+                          selected: allowedExtensions.contains('doc'),
+                          onSelected: (selected) {
+                            setDialogState(() {
+                              if (selected) {
+                                allowedExtensions.add('doc');
+                              } else {
+                                allowedExtensions.remove('doc');
+                              }
+                            });
+                          },
+                        ),
+                        FilterChip(
+                          label: const Text('DOCX'),
+                          selected: allowedExtensions.contains('docx'),
+                          onSelected: (selected) {
+                            setDialogState(() {
+                              if (selected) {
+                                allowedExtensions.add('docx');
+                              } else {
+                                allowedExtensions.remove('docx');
+                              }
+                            });
+                          },
+                        ),
+                        FilterChip(
+                          label: const Text('JPG'),
+                          selected: allowedExtensions.contains('jpg'),
+                          onSelected: (selected) {
+                            setDialogState(() {
+                              if (selected) {
+                                allowedExtensions.add('jpg');
+                              } else {
+                                allowedExtensions.remove('jpg');
+                              }
+                            });
+                          },
+                        ),
+                        FilterChip(
+                          label: const Text('PNG'),
+                          selected: allowedExtensions.contains('png'),
+                          onSelected: (selected) {
+                            setDialogState(() {
+                              if (selected) {
+                                allowedExtensions.add('png');
+                              } else {
+                                allowedExtensions.remove('png');
+                              }
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            );
+          }),
           actions: [
             TextButton(
               child: const Text("Cancel"),
@@ -202,19 +285,146 @@ class _CreateFormPageState extends State<CreateFormPage> {
             TextButton(
               child: const Text("Add"),
               onPressed: () {
+                if (newFieldController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Please enter a field name")),
+                  );
+                  return;
+                }
+
+                if (allowedExtensions.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text("Please select at least one file type")),
+                  );
+                  return;
+                }
+
+                int fileCount = 1;
+                try {
+                  fileCount = int.parse(fileCountController.text);
+                  if (fileCount < 0) {
+                    fileCount = 0; // Unlimited files
+                  }
+                } catch (e) {
+                  fileCount = 1; // Default to 1 if parsing fails
+                }
+
                 setState(() {
-                  _controllersList.add(newFieldController);
                   _formList.add(FileUploadField(
                     label: newFieldController.text,
-                    fileCount: fileCountController.text.isNotEmpty
-                        ? int.parse(fileCountController.text)
-                        : 1,
+                    fileCount: fileCount,
+                    allowedExtensions: allowedExtensions,
                   ));
                 });
                 Navigator.of(context).pop();
               },
             ),
           ],
+        );
+      },
+    );
+  }
+
+  void _showMultiSelectFieldDialog() {
+    TextEditingController newFieldController = TextEditingController();
+    TextEditingController optionController = TextEditingController();
+    List<String> multiSelectItems = [];
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding: const EdgeInsets.all(10),
+          child: StatefulBuilder(
+            builder: (context, setDialogState) {
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      "Add New MultiSelect Field",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: newFieldController,
+                      decoration:
+                          const InputDecoration(labelText: "Field Name"),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: optionController,
+                      decoration:
+                          const InputDecoration(labelText: "Add Option"),
+                    ),
+                    const SizedBox(height: 5),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (optionController.text.isNotEmpty) {
+                          setDialogState(() {
+                            multiSelectItems.add(optionController.text);
+                            optionController.clear();
+                          });
+                        }
+                      },
+                      child: const Text("Add Option"),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      children: multiSelectItems
+                          .map(
+                            (item) => Chip(
+                              label: Text(item),
+                              onDeleted: () {
+                                setDialogState(() {
+                                  multiSelectItems.remove(item);
+                                });
+                              },
+                            ),
+                          )
+                          .toList(),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          child: const Text("Cancel"),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: const Text("Add"),
+                          onPressed: () {
+                            if (newFieldController.text.isNotEmpty &&
+                                multiSelectItems.isNotEmpty) {
+                              setState(() {
+                                _formList.add(
+                                  MultiSelectField(
+                                    dropDownItemsList: multiSelectItems,
+                                    onChanged: (List<String> values) {
+                                      // No need to set text like in dropdown
+                                    },
+                                    label: newFieldController.text,
+                                  ),
+                                );
+                              });
+                            }
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         );
       },
     );
@@ -335,7 +545,9 @@ class _CreateFormPageState extends State<CreateFormPage> {
               ),
               CustomFABChild(
                 label: "MultiSelect",
-                onTap: () {},
+                onTap: () {
+                  _showMultiSelectFieldDialog();
+                },
                 icon: const Icon(Icons.check_box),
               ),
             ],

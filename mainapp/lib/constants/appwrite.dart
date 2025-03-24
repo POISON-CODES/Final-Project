@@ -14,6 +14,7 @@ class Appwrite {
   static final Teams teams = Teams(client);
   static final Functions functions = Functions(client);
   static final Databases databases = Databases(client);
+  static final Storage storage = Storage(client);
 }
 
 class DatabaseIds {
@@ -41,4 +42,6 @@ class FunctionIds {
 
 class Buckets {
   static const String defaultResumeBucket = '67a86ff6000fcf767ea0';
+  static const String jdFilesBucket =
+      '67e1b0770005c7c11aaf'; // Using the same bucket for now, replace with actual JD bucket ID when created
 }

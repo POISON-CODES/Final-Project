@@ -11,3 +11,5 @@ part 'floating_action_button.dart';
 part 'generic_form_field.dart';
 part 'file_upload_field.dart';
 part 'configuration_card.dart';
+part 'multiselect_field.dart';
+part 'search_multiselect_field.dart';

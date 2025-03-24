@@ -11,6 +11,8 @@ class CompanyModel {
   final String provider;
   final List<String> eligibleBatchesIds;
   final String formId;
+  final List<String> jdFiles;
+
   CompanyModel({
     required this.id,
     required this.name,
@@ -20,6 +22,7 @@ class CompanyModel {
     required this.provider,
     required this.eligibleBatchesIds,
     required this.formId,
+    this.jdFiles = const [],
   });
 
   CompanyModel copyWith({
@@ -31,6 +34,7 @@ class CompanyModel {
     String? provider,
     List<String>? eligibleBatchesIds,
     String? formId,
+    List<String>? jdFiles,
   }) {
     return CompanyModel(
       id: id ?? this.id,
@@ -41,6 +45,7 @@ class CompanyModel {
       provider: provider ?? this.provider,
       eligibleBatchesIds: eligibleBatchesIds ?? this.eligibleBatchesIds,
       formId: formId ?? this.formId,
+      jdFiles: jdFiles ?? this.jdFiles,
     );
   }
 
@@ -54,6 +59,7 @@ class CompanyModel {
       'provider': provider,
       'eligibleBatchesIds': eligibleBatchesIds,
       'formId': formId,
+      'jdFiles': jdFiles,
     };
   }
 
@@ -68,6 +74,9 @@ class CompanyModel {
       eligibleBatchesIds:
           List<String>.from((map['eligibleBatchesIds'] as List<String>)),
       formId: map['formId'] as String,
+      jdFiles: map['jdFiles'] != null
+          ? List<String>.from((map['jdFiles'] as List))
+          : const [],
     );
   }
 
@@ -78,7 +87,7 @@ class CompanyModel {
 
   @override
   String toString() {
-    return 'CompanyModel(id: $id, name: $name, positions: $positions, ctc: $ctc, location: $location, provider: $provider, eligibleBatchesIds: $eligibleBatchesIds, formId: $formId)';
+    return 'CompanyModel(id: $id, name: $name, positions: $positions, ctc: $ctc, location: $location, provider: $provider, eligibleBatchesIds: $eligibleBatchesIds, formId: $formId, jdFiles: $jdFiles)';
   }
 
   @override
@@ -93,7 +102,8 @@ class CompanyModel {
         other.location == location &&
         other.provider == provider &&
         listEquals(other.eligibleBatchesIds, eligibleBatchesIds) &&
-        other.formId == formId;
+        other.formId == formId &&
+        listEquals(other.jdFiles, jdFiles);
   }
 
   @override
@@ -105,6 +115,7 @@ class CompanyModel {
         location.hashCode ^
         provider.hashCode ^
         eligibleBatchesIds.hashCode ^
-        formId.hashCode;
+        formId.hashCode ^
+        jdFiles.hashCode;
   }
 }

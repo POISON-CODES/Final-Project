@@ -23,4 +23,17 @@ class FormRemoteRepository {
       throw e.toString();
     }
   }
+
+  Future<List<FormModel>> getAllForms() async {
+    try {
+      final docs = await Appwrite.databases.listDocuments(
+        databaseId: DatabaseIds.crcDatabase,
+        collectionId: CollectionsIds.formsCollection,
+      );
+
+      return docs.documents.map((doc) => FormModel.fromAppwrite(doc)).toList();
+    } catch (e) {
+      throw e.toString();
+    }
+  }
 }

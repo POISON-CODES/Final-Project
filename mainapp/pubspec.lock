@@ -113,6 +113,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.2"
+  dropdown_model_list:
+    dependency: "direct main"
+    description:
+      name: dropdown_model_list
+      sha256: "04f62eb87d4f834f886eac31cf01931966b40e345c4ee53024030c1981d37f53"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.5"
   fake_async:
     dependency: transitive
     description:

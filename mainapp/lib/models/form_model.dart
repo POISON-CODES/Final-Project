@@ -14,6 +14,8 @@ class FormModel {
     required this.responses,
   });
 
+  String get title => name;
+
   FormModel copyWith({
     String? id,
     String? name,

@@ -25,4 +25,14 @@ class FormCubit extends Cubit<FormState> {
       emit(FormError(e.toString()));
     }
   }
+
+  void getAllForms() async {
+    try {
+      emit(FormLoading());
+      List<FormModel> forms = await formRemoteRepository.getAllForms();
+      emit(FormsList(forms));
+    } catch (e) {
+      emit(FormError(e.toString()));
+    }
+  }
 }

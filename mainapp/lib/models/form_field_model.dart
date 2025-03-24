@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'models.dart';
 
-enum FieldType { text, dropdown, file }
+enum FieldType { text, dropdown, file, multiselect }
 
 class FormFieldModel {
   final String label;

@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:mainapp/constants/constants.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
-import 'package:mainapp/features/companies/pages/create_new_company.dart';
+import 'package:mainapp/features/companies/pages/company_pages.dart';
 import 'package:mainapp/features/configurations/pages/change_configuration.dart';
 import 'package:mainapp/features/forms/page/form_pages.dart';
 import 'package:mainapp/features/home/pages/tabs/tabs.dart';
