@@ -42,6 +42,6 @@ class FunctionIds {
 
 class Buckets {
   static const String defaultResumeBucket = '67a86ff6000fcf767ea0';
-  static const String jdFilesBucket =
-      '67e1b0770005c7c11aaf'; // Using the same bucket for now, replace with actual JD bucket ID when created
+  static const String jdFilesBucket = '67e1b0770005c7c11aaf';
+  static const String responseFilesBucket = '67e520880016c9e81087';
 }

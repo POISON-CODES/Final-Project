@@ -66,7 +66,7 @@ class FormFieldModel {
       obscureText: map['obscureText'] as bool?,
       textInputType: map['textInputType'] != null
           ? TextInputType.values[map['textInputType']]
-          : null,
+          : TextInputType.text,
       enabled: map['enabled'] as bool?,
       dropDownItemsList: map['dropDownItemsList'] != null
           ? List<String>.from(map['dropDownItemsList'])

@@ -74,7 +74,7 @@ class FormModel {
 
     return other.id == id &&
         other.name == name &&
-        other.fields == fields &&
+        listEquals(other.fields, fields) &&
         listEquals(other.responses, responses);
   }
 

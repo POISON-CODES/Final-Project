@@ -5,39 +5,49 @@ class UserModel {
   final String name;
   final String email;
   final String phoneNumber;
-  Position position;
+  final Role role;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   UserModel({
     required this.id,
     required this.name,
     required this.email,
     required this.phoneNumber,
-    this.position = Position.student,
+    required this.role,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
-  factory UserModel.fromAppwrite(User user) {
-    return UserModel(
-      id: user.$id,
-      name: user.name,
-      email: user.email,
-      phoneNumber: user.phone,
-      position: Position.student,
-    );
-  }
+  // factory UserModel.fromAppwrite(User user) {
+  //   return UserModel(
+  //     id: user.$id,
+  //     name: user.name,
+  //     email: user.email,
+  //     phoneNumber: '', // Default empty string if not available
+  //     role: Role.values.byName(user.role),
+  //     createdAt: DateTime.parse(user.$createdAt),
+  //     updatedAt: DateTime.parse(user.$updatedAt),
+  //   );
+  // }
 
   UserModel copyWith({
     String? id,
     String? name,
     String? email,
     String? phoneNumber,
-    Position? position,
+    Role? role,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return UserModel(
       id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
       phoneNumber: phoneNumber ?? this.phoneNumber,
-      position: position ?? this.position,
+      role: role ?? this.role,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -45,18 +55,20 @@ class UserModel {
     return {
       'name': name,
       'email': email,
-      'phoneNumber': phoneNumber,
-      'position': position.name, // Store as a string
+      'phone_number': phoneNumber,
+      'role': role.toString().split('.').last,
     };
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      id: map['id'] ?? '',
+      id: map['\$id'] ?? '',
       name: map['name'] ?? '',
       email: map['email'] ?? '',
-      phoneNumber: map['phoneNumber'] ?? '',
-      position: Position.values.byName(map['position'] ?? 'student'),
+      phoneNumber: map['phone_number'] ?? '',
+      role: Role.values.byName(map['role']),
+      createdAt: DateTime.parse(map['\$createdAt']),
+      updatedAt: DateTime.parse(map['\$updatedAt']),
     );
   }
 
@@ -67,7 +79,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, position: ${position.name})';
+    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, role: $role, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -78,7 +90,9 @@ class UserModel {
         other.name == name &&
         other.email == email &&
         other.phoneNumber == phoneNumber &&
-        other.position == position;
+        other.role == role &&
+        other.createdAt == createdAt &&
+        other.updatedAt == updatedAt;
   }
 
   @override
@@ -87,6 +101,8 @@ class UserModel {
         name.hashCode ^
         email.hashCode ^
         phoneNumber.hashCode ^
-        position.hashCode;
+        role.hashCode ^
+        createdAt.hashCode ^
+        updatedAt.hashCode;
   }
 }

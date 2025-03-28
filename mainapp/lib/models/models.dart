@@ -14,3 +14,4 @@ part 'update_model.dart';
 part 'user_detail_model.dart';
 part 'user_model.dart';
 part 'picked_files.dart';
+part 'form_response_model.dart';

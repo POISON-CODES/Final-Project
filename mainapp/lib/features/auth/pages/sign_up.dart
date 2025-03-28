@@ -4,6 +4,7 @@ import 'package:mainapp/core/utils/utils.dart';
 import 'package:mainapp/custom/widgets/custom_global_widgets.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
 import 'package:mainapp/features/auth/pages/log_in.dart';
+import 'package:mainapp/features/home/pages/home_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -33,11 +34,12 @@ class _SignUpPageState extends State<SignUpPage> {
 
   void _createUser() {
     if (formKey.currentState!.validate()) {
-      context.read<AuthCubit>().createUser(
+      context.read<AuthCubit>().signUp(
             name: nameController.text.trim(),
             email: emailController.text.trim(),
             phoneNumber: phoneController.text.trim(),
             password: passwordController.text.trim(),
+            context: context,
           );
     }
   }
@@ -50,15 +52,11 @@ class _SignUpPageState extends State<SignUpPage> {
           if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.error),
+                content: Text(state.message),
               ),
             );
-          } else if (state is AuthSignUp) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("Account Created! Login Now!"),
-              ),
-            );
+          } else if (state is AuthAuthenticated) {
+            Navigator.of(context).push(HomePage.route());
           }
         },
         builder: (context, state) {

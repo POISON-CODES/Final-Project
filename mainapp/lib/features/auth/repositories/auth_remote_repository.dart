@@ -1,53 +1,24 @@
-import 'dart:convert';
-
-import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
+import 'package:appwrite/appwrite.dart' show AppwriteException, ID, Query;
 import 'package:mainapp/constants/constants.dart';
 import 'package:mainapp/models/models.dart';
 
 class AuthRemoteRepository {
   Future<UserModel?> getCurrentUser() async {
-    User? user;
-
     try {
-      user = await Appwrite.account.get();
+      final user = await Appwrite.account.get();
+      final userDoc = await Appwrite.databases.getDocument(
+        databaseId: DatabaseIds.crcDatabase,
+        collectionId: CollectionsIds.usersCollection,
+        documentId: user.$id,
+      );
+
+      return UserModel.fromMap({
+        ...user.toMap(),
+        ...userDoc.data,
+      });
     } catch (e) {
-      user = null;
       return null;
     }
-
-    final teamIds = [
-      TeamIds.adminTeamId,
-      TeamIds.coordinatorTeamId,
-      TeamIds.studentTeamId
-    ];
-
-    MembershipList? userTeamList;
-    String userTeamId = TeamIds.studentTeamId;
-
-    for (var teamId in teamIds) {
-      try {
-        userTeamList = await Appwrite.teams.listMemberships(teamId: teamId);
-        final isMember =
-            userTeamList.memberships.any((m) => m.userId == user!.$id);
-
-        if (isMember) {
-          userTeamId = teamId;
-          break;
-        }
-      } catch (e) {
-        continue;
-      }
-    }
-
-    final userModel = UserModel.fromAppwrite(user);
-    userModel.position = userTeamId == TeamIds.adminTeamId
-        ? Position.admin
-        : userTeamId == TeamIds.coordinatorTeamId
-            ? Position.coordinator
-            : Position.student;
-
-    return userModel;
   }
 
   Future<UserModel> logInUser({
@@ -61,39 +32,16 @@ class AuthRemoteRepository {
       );
 
       final user = await Appwrite.account.get();
+      final userDoc = await Appwrite.databases.getDocument(
+        databaseId: DatabaseIds.crcDatabase,
+        collectionId: CollectionsIds.usersCollection,
+        documentId: user.$id,
+      );
 
-      final teamIds = [
-        TeamIds.adminTeamId,
-        TeamIds.coordinatorTeamId,
-        TeamIds.studentTeamId
-      ];
-
-      MembershipList? userTeamList;
-      String userTeamId = '';
-
-      for (var teamId in teamIds) {
-        try {
-          userTeamList = await Appwrite.teams.listMemberships(teamId: teamId);
-          final isMember =
-              userTeamList.memberships.any((m) => m.userId == user.$id);
-
-          if (isMember) {
-            userTeamId = teamId;
-            break;
-          }
-        } catch (e) {
-          continue;
-        }
-      }
-
-      final userModel = UserModel.fromAppwrite(user);
-      userModel.position = userTeamId == TeamIds.adminTeamId
-          ? Position.admin
-          : userTeamId == TeamIds.coordinatorTeamId
-              ? Position.coordinator
-              : Position.student;
-
-      return userModel;
+      return UserModel.fromMap({
+        ...user.toMap(),
+        ...userDoc.data,
+      });
     } on AppwriteException catch (e) {
       throw Exception('Login failed: ${e.message}');
     } catch (e) {
@@ -101,40 +49,103 @@ class AuthRemoteRepository {
     }
   }
 
-  Future<UserModel?> createUser({
+  Future<UserModel> createUser({
     required String email,
     required String password,
     required String name,
     required String phoneNumber,
+    Role role = Role.student,
   }) async {
     try {
-      User user = await Appwrite.account.create(
+      final user = await Appwrite.account.create(
         userId: ID.unique(),
         email: email,
         password: password,
         name: name,
       );
 
-      await Appwrite.functions.createExecution(
-          functionId: FunctionIds.addUserToTeam,
-          body: json.encode({
-            "userId": user.$id,
-            "teamId": TeamIds.studentTeamId,
-            "email": email,
-          }));
-
-      final userModel =
-          UserModel.fromAppwrite(user).copyWith(phoneNumber: phoneNumber);
-
       await Appwrite.databases.createDocument(
-          databaseId: DatabaseIds.crcDatabase,
-          collectionId: CollectionsIds.usersCollection,
-          documentId: user.$id,
-          data: userModel.toMap());
+        databaseId: DatabaseIds.crcDatabase,
+        collectionId: CollectionsIds.usersCollection,
+        documentId: user.$id,
+        data: {
+          'name': name,
+          'email': email,
+          'phoneNumber': phoneNumber,
+          'role': role.toString().split('.').last,
+        },
+      );
 
-      return userModel;
+      return UserModel.fromMap({
+        ...user.toMap(),
+        'phoneNumber': phoneNumber,
+        'role': role.toString().split('.').last,
+      });
+    } on AppwriteException catch (e) {
+      throw Exception('Signup failed: ${e.message}');
     } catch (e) {
-      throw e.toString();
+      throw Exception('Unexpected error: $e');
     }
+  }
+
+  Future<void> updateUserRole(String userId, Role newRole) async {
+    try {
+      await Appwrite.databases.updateDocument(
+        databaseId: DatabaseIds.crcDatabase,
+        collectionId: CollectionsIds.usersCollection,
+        documentId: userId,
+        data: {
+          'role': newRole.toString().split('.').last,
+        },
+      );
+    } catch (e) {
+      throw Exception('Failed to update user role: $e');
+    }
+  }
+
+  Future<void> signOut() async {
+    try {
+      await Appwrite.account.deleteSession(sessionId: 'current');
+    } catch (e) {
+      throw Exception('Failed to sign out: $e');
+    }
+  }
+
+  Future<List<UserModel>> getUsersByRole(Role role) async {
+    try {
+      final docs = await Appwrite.databases.listDocuments(
+        databaseId: DatabaseIds.crcDatabase,
+        collectionId: CollectionsIds.usersCollection,
+        queries: [
+          Query.equal('role', Role.admin.name),
+        ],
+      );
+      return docs.documents.map((doc) {
+        // final userData = doc.data;
+        return UserModel.fromMap({
+          'id': doc.$id,
+          'name': "Aman Keswani",
+          'email': "aman@gmail.com",
+          'phoneNumber': "+919826000000",
+          'role': Role.admin.name,
+          '\$createdAt': doc.$createdAt,
+          '\$updatedAt': doc.$updatedAt,
+        });
+      }).toList();
+    } catch (e) {
+      throw Exception('Failed to get users by role: $e');
+    }
+  }
+
+  Future<List<UserModel>> getAllAdmins() async {
+    return getUsersByRole(Role.admin);
+  }
+
+  Future<List<UserModel>> getAllStudents() async {
+    return getUsersByRole(Role.student);
+  }
+
+  Future<List<UserModel>> getAllCoordinators() async {
+    return getUsersByRole(Role.coordinator);
   }
 }

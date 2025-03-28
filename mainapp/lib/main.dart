@@ -27,13 +27,13 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    context.read<AuthCubit>().getInitialUser();
+    context.read<AuthCubit>().checkAuthStatus();
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'CRC APP',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: "Cera Pro",
@@ -87,7 +87,7 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
       ),
       home: BlocBuilder<AuthCubit, AuthState>(builder: (context, state) {
-        if (state is AuthLogin) {
+        if (state is AuthAuthenticated) {
           return const HomePage();
         } else {
           return const SignUpPage();

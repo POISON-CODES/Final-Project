@@ -3,6 +3,7 @@ part of 'custom_global_widgets.dart';
 class CustomDropDown extends FormFields {
   final void Function(String?) onChanged;
   final String? initialValue;
+  final List<Widget>? customItems;
 
   const CustomDropDown({
     super.key,
@@ -12,6 +13,7 @@ class CustomDropDown extends FormFields {
     required super.dropDownItemsList,
     required this.onChanged,
     this.initialValue,
+    this.customItems,
   });
 
   @override
@@ -76,28 +78,30 @@ class _CustomDropDownState extends State<CustomDropDown> {
               child: ListView(
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
-                children: widget.dropDownItemsList?.map((item) {
-                      bool isSelected = _selectedItem == item;
-                      return ListTile(
-                        dense: true,
-                        title: Text(item),
-                        trailing: isSelected
-                            ? Icon(Icons.check,
-                                color: Theme.of(context).primaryColor)
-                            : null,
-                        onTap: () {
-                          setState(() {
-                            _selectedItem = item;
-                            widget.onChanged(_selectedItem);
+                children: widget.customItems != null
+                    ? widget.customItems!
+                    : widget.dropDownItemsList?.map((item) {
+                          bool isSelected = _selectedItem == item;
+                          return ListTile(
+                            dense: true,
+                            title: Text(item),
+                            trailing: isSelected
+                                ? Icon(Icons.check,
+                                    color: Theme.of(context).primaryColor)
+                                : null,
+                            onTap: () {
+                              setState(() {
+                                _selectedItem = item;
+                                widget.onChanged(_selectedItem);
 
-                            // Close the dropdown after selection
-                            _removeOverlay();
-                            _isExpanded = false;
-                          });
-                        },
-                      );
-                    }).toList() ??
-                    [],
+                                // Close the dropdown after selection
+                                _removeOverlay();
+                                _isExpanded = false;
+                              });
+                            },
+                          );
+                        }).toList() ??
+                        [],
               ),
             ),
           ),

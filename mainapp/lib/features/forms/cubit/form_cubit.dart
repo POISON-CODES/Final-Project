@@ -35,4 +35,44 @@ class FormCubit extends Cubit<FormState> {
       emit(FormError(e.toString()));
     }
   }
+
+  Future<Map<String, dynamic>> getForm(String formId) async {
+    try {
+      emit(FormLoading());
+      final formData = await formRemoteRepository.getForm(formId);
+      return formData;
+    } catch (e) {
+      emit(FormError(e.toString()));
+      rethrow;
+    }
+  }
+
+  Future<String> uploadFormFile(
+    List<int> fileBytes,
+    String fileName,
+    String contentType,
+  ) async {
+    try {
+      emit(FormLoading());
+      final fileId = await formRemoteRepository.uploadFormFile(
+        fileBytes,
+        fileName,
+        contentType,
+      );
+      return fileId;
+    } catch (e) {
+      emit(FormError(e.toString()));
+      rethrow;
+    }
+  }
+
+  Future<void> submitFormResponse(FormResponseModel response) async {
+    try {
+      emit(FormLoading());
+      await formRemoteRepository.submitFormResponse(response);
+    } catch (e) {
+      emit(FormError(e.toString()));
+      rethrow;
+    }
+  }
 }

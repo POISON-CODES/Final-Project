@@ -439,23 +439,20 @@ class _CreateFormPageState extends State<CreateFormPage> {
         textInputType: field.textInputType,
         enabled: field.enabled,
         dropDownItemsList: field.dropDownItemsList,
-        fileCount: field.fileCount,
+        fileCount: field.fileCount ?? 1,
         isRequired: field.isRequired,
       );
     }).toList();
 
-    Map<String, dynamic> formJson = {
-      "id": "form_${DateTime.now().millisecondsSinceEpoch}",
-      "titl": _titleController.text.isEmpty
-          ? "Untitled Form"
-          : _titleController.text,
-      "fields": formFields.map((e) => e.toMap()).toList(),
-      "createdAt": DateTime.now().toIso8601String(),
-    };
+    // Map<String, dynamic> formJson = {
+    //   "id": "form_${DateTime.now().millisecondsSinceEpoch}",
+    //   "fields": formFields.map((e) => e.toMap()).toList(),
+    //   "createdAt": DateTime.now().toIso8601String(),
+    // };
 
     context.read<form_cubit.FormCubit>().createForm(
           title: _titleController.text,
-          fields: formJson.toString(),
+          fields: formFields.map((e) => e.toJson()).toList().toString(),
         );
   }
 

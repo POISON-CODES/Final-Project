@@ -1,6 +1,6 @@
 part of 'constants.dart';
 
-enum Position { admin, coordinator, student }
+enum Role { admin, coordinator, student }
 
 enum Priority { low, medium, high }
 

@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
       builder: (context, state) {
         return Scaffold(
           floatingActionButton:
-              (state is AuthLogin && state.user.position == Position.admin)
+              (state is AuthAuthenticated && state.user.role == Role.admin)
                   ? customFloatingActionButton(
                       context: context,
                       mainIcon: Icons.add,

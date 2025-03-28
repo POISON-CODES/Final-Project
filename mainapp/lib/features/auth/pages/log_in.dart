@@ -30,9 +30,10 @@ class _LoginPageState extends State<LoginPage> {
 
   void _logInUser() {
     if (formKey.currentState!.validate()) {
-      context.read<AuthCubit>().logInUser(
+      context.read<AuthCubit>().signIn(
             email: emailController.text.trim(),
             password: passwordController.text.trim(),
+            context: context,
           );
     }
   }
@@ -45,10 +46,10 @@ class _LoginPageState extends State<LoginPage> {
           if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.error),
+                content: Text(state.message),
               ),
             );
-          } else if (state is AuthLogin) {
+          } else if (state is AuthAuthenticated) {
             Navigator.of(context).push(HomePage.route());
           }
         },

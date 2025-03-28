@@ -2,6 +2,7 @@ part of 'custom_global_widgets.dart';
 
 class FileUploadField extends FormFields {
   final List<String>? allowedExtensions;
+  @override
   final int fileCount;
   final void Function(List<PlatformFile>)? onFilesSelected;
 

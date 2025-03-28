@@ -8,9 +8,9 @@ class ConfigurationDetailPage extends StatelessWidget {
   final ConfigurationModel configuration;
 
   const ConfigurationDetailPage({
-    Key? key,
+    super.key,
     required this.configuration,
-  }) : super(key: key);
+  });
 
   static MaterialPageRoute route(ConfigurationModel configuration) =>
       MaterialPageRoute(
