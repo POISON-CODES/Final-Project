@@ -36,7 +36,6 @@ class _DisplayFormPageState extends State<DisplayFormPage> {
     try {
       final formData =
           await context.read<form_cubit.FormCubit>().getForm(widget.formId);
-      print(formData);
       setState(() {
         _formData = formData;
         _initializeControllers();

@@ -90,10 +90,22 @@ class CompanyDetailsPage extends StatelessWidget {
                         children: [
                           const Icon(Icons.person, size: 16),
                           const SizedBox(width: 4),
-                          Text("Provider: ${company.provider}"),
+                          Text("Float By: ${company.floatBy}"),
                         ],
                       ),
                     ),
+                    if (company.description != null &&
+                        company.description!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          company.description!,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -109,25 +121,114 @@ class CompanyDetailsPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Card(
-              child: ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: company.positions.length,
-                separatorBuilder: (_, __) => const Divider(),
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(company.positions[index]),
-                    trailing: Text(
-                      company.ctc[index],
-                      style: const TextStyle(
+              margin: const EdgeInsets.only(bottom: 16),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Positions and CTCs",
+                      style: TextStyle(
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.green,
                       ),
                     ),
-                  );
-                },
+                    const SizedBox(height: 8),
+                    for (int i = 0; i < company.positions.length; i++)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              company.positions[i],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              company.ctc[i],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
+
+            // Updates Section
+            if (company.updates != null && company.updates!.isNotEmpty)
+              Card(
+                margin: const EdgeInsets.only(bottom: 16),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Updates",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      for (var update in company.updates!)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.update, size: 16),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(update),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+
+            // Students Section
+            if (company.students != null && company.students!.isNotEmpty)
+              Card(
+                margin: const EdgeInsets.only(bottom: 16),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Students",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: company.students!.map((studentId) {
+                          return Chip(
+                            label: Text(studentId),
+                            avatar: const Icon(Icons.person, size: 16),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
 
             const SizedBox(height: 16),
 

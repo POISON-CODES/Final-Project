@@ -28,31 +28,24 @@ class _FileUploadFieldState extends State<FileUploadField> {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
-        allowMultiple: widget.fileCount > 1,
+        allowMultiple: widget.fileCount == 0 || widget.fileCount > 1,
         allowedExtensions: widget.allowedExtensions,
+        withData: true,
       );
 
       if (result != null) {
         setState(() {
           // If fileCount is limited, ensure we don't exceed it
           if (widget.fileCount > 0) {
-            // Clear previous selection if we're at the limit
-            if (_selectedFiles.length + result.files.length >
-                widget.fileCount) {
-              _selectedFiles.clear();
-            }
-
-            // Add only up to the file count limit
-            if (result.files.length > widget.fileCount) {
-              _selectedFiles.addAll(result.files.sublist(0, widget.fileCount));
-            } else {
-              _selectedFiles.addAll(result.files);
-            }
-
-            // If we're still over limit (due to previous selections), trim
-            if (_selectedFiles.length > widget.fileCount) {
-              _selectedFiles.removeRange(
-                  widget.fileCount, _selectedFiles.length);
+            // Calculate how many more files we can add
+            final remainingSlots = widget.fileCount - _selectedFiles.length;
+            if (remainingSlots > 0) {
+              // Add only up to the remaining slots
+              if (result.files.length > remainingSlots) {
+                _selectedFiles.addAll(result.files.sublist(0, remainingSlots));
+              } else {
+                _selectedFiles.addAll(result.files);
+              }
             }
           } else {
             // No limit, add all files
@@ -67,7 +60,8 @@ class _FileUploadFieldState extends State<FileUploadField> {
       }
     } catch (e) {
       // Handle error
-      print("Error picking files: $e");
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Error picking files: $e")));
     }
   }
 

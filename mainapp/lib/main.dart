@@ -6,6 +6,7 @@ import 'package:mainapp/features/companies/cubit/company_cubit.dart';
 import 'package:mainapp/features/configurations/cubit/configuration_cubit.dart';
 import 'package:mainapp/features/forms/cubit/form_cubit.dart';
 import 'package:mainapp/features/home/pages/home_page.dart';
+import 'package:mainapp/features/updates/cubit/update_cubit.dart';
 
 void main() {
   runApp(MultiBlocProvider(providers: [
@@ -13,6 +14,7 @@ void main() {
     BlocProvider(create: (_) => ConfigurationCubit()),
     BlocProvider(create: (_) => FormCubit()),
     BlocProvider(create: (_) => CompanyCubit()),
+    BlocProvider(create: (_) => UpdateCubit()),
   ], child: const MyApp()));
 }
 
@@ -87,7 +89,9 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
       ),
       home: BlocBuilder<AuthCubit, AuthState>(builder: (context, state) {
-        if (state is AuthAuthenticated) {
+        if (state is AuthAdminAuthenticated ||
+            state is AuthCoordinatorAuthenticated ||
+            state is AuthStudentAuthenticated) {
           return const HomePage();
         } else {
           return const SignUpPage();

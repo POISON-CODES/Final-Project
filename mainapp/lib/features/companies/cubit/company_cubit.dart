@@ -16,10 +16,15 @@ class CompanyCubit extends Cubit<CompanyState> {
     required List<String> positions,
     required List<String> ctc,
     String? location,
-    required String provider,
+    String? description,
+    required String floatBy,
     required List<String> eligibleBatchesIds,
     required String formId,
     List<String> jdFiles = const [],
+    DateTime? deadline,
+    DateTime? floatTime,
+    List<String>? updates,
+    List<String>? students,
   }) async {
     try {
       emit(CompanyLoading());
@@ -28,10 +33,15 @@ class CompanyCubit extends Cubit<CompanyState> {
           positions: positions,
           ctc: ctc,
           location: location,
-          provider: provider,
+          description: description,
+          floatBy: floatBy,
           eligibleBatchesIds: eligibleBatchesIds,
           formId: formId,
-          jdFiles: jdFiles);
+          jdFiles: jdFiles,
+          deadline: deadline,
+          floatTime: DateTime.now(),
+          updates: updates,
+          students: students);
       emit(CompanyCreated(model: company!));
     } catch (e) {
       emit(CompanyError(e.toString()));
@@ -55,10 +65,15 @@ class CompanyCubit extends Cubit<CompanyState> {
     required List<String> positions,
     required List<String> ctc,
     String? location,
-    required String provider,
+    String? description,
+    required String floatBy,
     required List<String> eligibleBatchesIds,
     required String formId,
     List<String>? jdFiles,
+    DateTime? deadline,
+    DateTime? floatTime,
+    List<String>? updates,
+    List<String>? students,
   }) async {
     try {
       emit(CompanyLoading());
@@ -68,10 +83,15 @@ class CompanyCubit extends Cubit<CompanyState> {
           positions: positions,
           ctc: ctc,
           location: location,
-          provider: provider,
+          description: description,
+          floatBy: floatBy,
           eligibleBatchesIds: eligibleBatchesIds,
           formId: formId,
-          jdFiles: jdFiles);
+          jdFiles: jdFiles,
+          deadline: deadline,
+          floatTime: floatTime,
+          updates: updates,
+          students: students);
       emit(CompanyEdit(model: company));
     } catch (e) {
       emit(CompanyError(e.toString()));

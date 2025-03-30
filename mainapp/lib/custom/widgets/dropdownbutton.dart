@@ -10,7 +10,7 @@ class CustomDropDown extends FormFields {
     super.fieldType = FieldType.dropdown,
     super.isRequired = true,
     required super.label,
-    required super.dropDownItemsList,
+    super.dropDownItemsList,
     required this.onChanged,
     this.initialValue,
     this.customItems,

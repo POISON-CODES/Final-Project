@@ -49,7 +49,9 @@ class _LoginPageState extends State<LoginPage> {
                 content: Text(state.message),
               ),
             );
-          } else if (state is AuthAuthenticated) {
+          } else if (state is AuthAdminAuthenticated ||
+              state is AuthCoordinatorAuthenticated ||
+              state is AuthStudentAuthenticated) {
             Navigator.of(context).push(HomePage.route());
           }
         },

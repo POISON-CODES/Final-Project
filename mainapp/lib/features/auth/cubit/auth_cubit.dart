@@ -27,7 +27,7 @@ class AuthCubit extends Cubit<AuthState> {
           content: Text("Successfully logged in"),
         ),
       );
-      emit(AuthAuthenticated(user));
+      emit(AuthStudentAuthenticated(user));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -55,7 +55,7 @@ class AuthCubit extends Cubit<AuthState> {
           content: Text("Account Created! "),
         ),
       );
-      emit(AuthAuthenticated(user));
+      emit(AuthStudentAuthenticated(user));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -76,7 +76,13 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthLoading());
       final user = await _authRepository.getCurrentUser();
       if (user != null) {
-        emit(AuthAuthenticated(user));
+        if (user.role == Role.admin) {
+          emit(AuthAdminAuthenticated(user));
+        } else if (user.role == Role.coordinator) {
+          emit(AuthCoordinatorAuthenticated(user));
+        } else if (user.role == Role.student) {
+          emit(AuthStudentAuthenticated(user));
+        }
       } else {
         emit(AuthUnauthenticated());
       }

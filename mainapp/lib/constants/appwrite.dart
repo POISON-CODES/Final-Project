@@ -33,6 +33,7 @@ class CollectionsIds {
   static const String usersCollection = '67a6fef2003d7ef6d69f';
   static const String companiesCollection = '67a5a04200109abb5416';
   static const String formsCollection = '67e14c440023de079420';
+  static const String updatesCollection = '67e7bb6200014fc54cff';
 }
 
 class FunctionIds {

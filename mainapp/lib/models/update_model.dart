@@ -3,21 +3,25 @@
 part of 'models.dart';
 
 class UpdateModel {
+  final String id;
   final String companyId;
   final String update;
   final Priority priority;
   UpdateModel({
+    required this.id,
     required this.companyId,
     required this.update,
     required this.priority,
   });
 
   UpdateModel copyWith({
+    String? id,
     String? companyId,
     String? update,
     Priority? priority,
   }) {
     return UpdateModel(
+      id: id ?? this.id,
       companyId: companyId ?? this.companyId,
       update: update ?? this.update,
       priority: priority ?? this.priority,
@@ -26,6 +30,7 @@ class UpdateModel {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
+      'id': id,
       'companyId': companyId,
       'update': update,
       'priority': priority.name,
@@ -34,6 +39,7 @@ class UpdateModel {
 
   factory UpdateModel.fromMap(Map<String, dynamic> map) {
     return UpdateModel(
+      id: map['id'] as String,
       companyId: map['companyId'] as String,
       update: map['update'] as String,
       priority: Priority.values
@@ -48,17 +54,19 @@ class UpdateModel {
 
   @override
   String toString() =>
-      'UpdateModel(companyId: $companyId, update: $update, priority: $priority)';
+      'UpdateModel(id: $id, companyId: $companyId, update: $update, priority: $priority)';
 
   @override
   bool operator ==(covariant UpdateModel other) {
     if (identical(this, other)) return true;
 
-    return other.companyId == companyId &&
+    return other.id == id &&
+        other.companyId == companyId &&
         other.update == update &&
         other.priority == priority;
   }
 
   @override
-  int get hashCode => companyId.hashCode ^ update.hashCode ^ priority.hashCode;
+  int get hashCode =>
+      id.hashCode ^ companyId.hashCode ^ update.hashCode ^ priority.hashCode;
 }

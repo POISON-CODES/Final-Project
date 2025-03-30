@@ -29,7 +29,7 @@ class _EditCompanyPageState extends State<EditCompanyPage> {
     _nameController = TextEditingController(text: widget.company.name);
     _locationController =
         TextEditingController(text: widget.company.location ?? '');
-    _providerController = TextEditingController(text: widget.company.provider);
+    _providerController = TextEditingController(text: widget.company.floatBy);
     _selectedBatchesIds.addAll(widget.company.eligibleBatchesIds);
 
     // Initialize position and CTC controllers

@@ -21,6 +21,7 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
 
   String? _selectedFormId;
   String? _selectedAdminId;
+  DateTime? _selectedDeadline;
 
   // For batch selection
   final List<String> _selectedBatchesIds = [];
@@ -88,13 +89,16 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
                     : 'application/msword',
               );
 
-          _uploadedJDFileIds.add(fileId);
+          setState(() {
+            _uploadedJDFileIds.add(fileId);
+          });
         }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error uploading files: $e")),
       );
+      rethrow; // Rethrow to handle in the calling method
     }
   }
 
@@ -106,6 +110,41 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
     if (result == true) {
       context.read<form_cubit.FormCubit>().getAllForms();
     }
+  }
+
+  Future<void> _selectDateTime() async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDeadline ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+
+    if (pickedDate != null) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+
+      if (pickedTime != null) {
+        final DateTime selectedDateTime = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+
+        setState(() {
+          _selectedDeadline = selectedDateTime;
+        });
+      }
+    }
+  }
+
+  String _formatDateTime(DateTime? dateTime) {
+    if (dateTime == null) return "Select Date & Time";
+    return "${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
   }
 
   Future<void> _createNewCompany() async {
@@ -155,32 +194,47 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
 
       // Upload JD files if any
       if (_selectedJDFiles.isNotEmpty) {
-        // Show loading dialog
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return const AlertDialog(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text("Uploading JD Files..."),
-                ],
-              ),
-            );
-          },
-        );
+        try {
+          // Show loading dialog
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return const AlertDialog(
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text("Uploading JD Files..."),
+                  ],
+                ),
+              );
+            },
+          );
 
-        // Upload files
-        await _uploadJDFiles();
+          // Clear previous uploaded file IDs
+          _uploadedJDFileIds.clear();
 
-        // Close loading dialog
-        Navigator.of(context).pop();
+          // Upload files
+          await _uploadJDFiles();
+
+          // Close loading dialog
+          Navigator.of(context).pop();
+        } catch (e) {
+          // Close loading dialog if it's showing
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error uploading files: $e")),
+          );
+          return;
+        }
       }
 
-      // Create company using the cubit
+      // Create company with uploaded file IDs
       context.read<CompanyCubit>().createCompany(
             name: _nameController.text,
             positions: positions,
@@ -188,26 +242,69 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
             location: _locationController.text.isEmpty
                 ? null
                 : _locationController.text,
-            provider: _selectedAdminId!,
+            description: _descriptionController.text.isEmpty
+                ? null
+                : _descriptionController.text,
+            floatBy: _selectedAdminId!,
             eligibleBatchesIds: _selectedBatchesIds,
             formId: _selectedFormId!,
             jdFiles: _uploadedJDFileIds,
+            deadline: _selectedDeadline,
           );
     }
+  }
+
+  // Add a method to clear form data
+  void _clearForm() {
+    setState(() {
+      // Clear text controllers
+      _nameController.clear();
+      _locationController.clear();
+      _descriptionController.clear();
+
+      // Clear position and CTC controllers
+      for (var controller in _positionControllers) {
+        controller.clear();
+      }
+      for (var controller in _ctcControllers) {
+        controller.clear();
+      }
+
+      // Reset other fields
+      _selectedFormId = null;
+      _selectedAdminId = null;
+      _selectedDeadline = null;
+      _selectedBatchesIds.clear();
+      _selectedJDFiles.clear();
+      _uploadedJDFileIds.clear();
+
+      // Reset form validation
+      _formKey.currentState?.reset();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: "Create Company", actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: IconButton(
-            onPressed: _createNewCompany,
-            icon: const Icon(Icons.check),
-          ),
+      appBar: CustomAppBar(
+        title: "Create Company",
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => {
+            context.read<AuthCubit>().checkAuthStatus(),
+            Navigator.of(context).pop()
+          },
         ),
-      ]),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              onPressed: _createNewCompany,
+              icon: const Icon(Icons.check),
+            ),
+          ),
+        ],
+      ),
       body: BlocConsumer<CompanyCubit, CompanyState>(
         listener: (context, state) {
           if (state is CompanyError) {
@@ -215,10 +312,11 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
               SnackBar(content: Text(state.error)),
             );
           } else if (state is CompanyCreated) {
+            // Clear form data on successful creation
+            _clearForm();
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Company created successfully!")),
             );
-            Navigator.pop(context);
           }
         },
         builder: (context, state) {
@@ -258,6 +356,58 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
                   ),
                   const SizedBox(height: 16),
 
+                  // Deadline field
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Application Deadline",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      InkWell(
+                        onTap: _selectDateTime,
+                        child: Container(
+                          width: double.infinity,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey.shade300,
+                              width: 3,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  _formatDateTime(_selectedDeadline),
+                                  style: TextStyle(
+                                    color: _selectedDeadline != null
+                                        ? Colors.black87
+                                        : Colors.grey.shade600,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.calendar_today,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
                   // Replace the provider text field with a dropdown
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, state) {
@@ -267,14 +417,6 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              "Provider",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
                             CustomDropDown(
                               label: "Select Provider",
                               isRequired: true,
@@ -417,85 +559,50 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            CustomDropDown(
-                              label: "Select Form",
-                              isRequired: true,
-                              dropDownItemsList: [
-                                ...state.forms.map((form) => form.title),
-                                if (state.forms.isNotEmpty)
-                                  "+ Create Custom Form",
-                              ],
-                              customItems: [
-                                ...state.forms.map((form) {
-                                  return ListTile(
-                                    dense: true,
-                                    title: Text(form.title),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(Icons.visibility),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              DisplayFormPage.route(form.id),
-                                            ).catchError((error) {
-                                              if (mounted) {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                        'Error viewing form: $error'),
-                                                    backgroundColor: Colors.red,
-                                                  ),
-                                                );
-                                              }
-                                            });
-                                          },
-                                        ),
-                                        if (_selectedFormId == form.id)
-                                          Icon(Icons.check,
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                      ],
-                                    ),
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedFormId = form.id;
-                                      });
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: CustomDropDown(
+                                    label: "Select Form",
+                                    isRequired: true,
+                                    dropDownItemsList: state.forms
+                                        .map((form) => form.name)
+                                        .toList(),
+                                    onChanged: (value) {
+                                      if (value != null) {
+                                        final selectedForm =
+                                            state.forms.firstWhere(
+                                          (form) => form.name == value,
+                                        );
+                                        setState(() {
+                                          _selectedFormId = selectedForm.id;
+                                        });
+                                      }
                                     },
-                                  );
-                                }),
-                                if (state.forms.isNotEmpty)
-                                  ListTile(
-                                    dense: true,
-                                    title: const Text("+ Create Custom Form"),
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedFormId = null;
-                                      });
-                                      _navigateToCreateForm();
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                if (_selectedFormId != null)
+                                  IconButton(
+                                    icon: const Icon(Icons.visibility),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        DisplayFormPage.route(_selectedFormId!),
+                                      );
                                     },
                                   ),
                               ],
-                              onChanged: (value) {
-                                if (value == "+ Create Custom Form") {
-                                  // Reset selection and go to create form
-                                  setState(() {
-                                    _selectedFormId = null;
-                                  });
-                                  _navigateToCreateForm();
-                                } else if (value != null) {
-                                  // Find the form ID from the selected title
-                                  final form = state.forms.firstWhere(
-                                    (f) => f.title == value,
-                                    orElse: () => state.forms.first,
-                                  );
-                                  setState(() {
-                                    _selectedFormId = form.id;
-                                  });
-                                }
+                            ),
+                            TextButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedFormId = null;
+                                });
+                                _navigateToCreateForm();
                               },
+                              icon: const Icon(Icons.add),
+                              label: const Text("Create Custom Form"),
                             ),
                           ],
                         );
@@ -538,13 +645,6 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
                               "${config.department.name.toUpperCase()} - ${config.course} - ${config.specialization}";
                           batchOptions.add(displayText);
                           batchIdToDisplayMap[config.id] = displayText;
-
-                          // Reverse mapping for selection
-                          for (var entry in batchIdToDisplayMap.entries) {
-                            if (entry.value == displayText) {
-                              _selectedBatchesIds.remove(entry.key);
-                            }
-                          }
                         }
 
                         return Column(
@@ -587,14 +687,14 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
                   const SizedBox(height: 16),
 
                   // JD Files Section
-                  const Text(
-                    "Job Description Files",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                  // const Text(
+                  //   "Job Description Files",
+                  //   style: TextStyle(
+                  //     fontSize: 18,
+                  //     fontWeight: FontWeight.bold,
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 8),
 
                   // Use the enhanced FileUploadField for JD files
                   FileUploadField(
@@ -603,7 +703,7 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
                     allowedExtensions: ['pdf', 'doc', 'docx'],
                     onFilesSelected: (files) {
                       setState(() {
-                        _selectedJDFiles.clear();
+                        _selectedJDFiles.clear(); // Clear previous selection
                         _selectedJDFiles.addAll(files);
                       });
                     },

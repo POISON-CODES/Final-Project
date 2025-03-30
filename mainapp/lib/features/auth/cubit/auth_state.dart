@@ -6,9 +6,19 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
-class AuthAuthenticated extends AuthState {
+class AuthAdminAuthenticated extends AuthState {
   final UserModel user;
-  AuthAuthenticated(this.user);
+  AuthAdminAuthenticated(this.user);
+}
+
+class AuthStudentAuthenticated extends AuthState {
+  final UserModel user;
+  AuthStudentAuthenticated(this.user);
+}
+
+class AuthCoordinatorAuthenticated extends AuthState {
+  final UserModel user;
+  AuthCoordinatorAuthenticated(this.user);
 }
 
 class AuthUnauthenticated extends AuthState {}

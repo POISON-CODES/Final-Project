@@ -121,9 +121,8 @@ class AuthRemoteRepository {
         ],
       );
       return docs.documents.map((doc) {
-        // final userData = doc.data;
         return UserModel.fromMap({
-          'id': doc.$id,
+          '\$id': doc.$id,
           'name': "Aman Keswani",
           'email': "aman@gmail.com",
           'phoneNumber': "+919826000000",

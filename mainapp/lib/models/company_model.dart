@@ -8,10 +8,15 @@ class CompanyModel {
   final List<String> positions;
   final List<String> ctc;
   final String? location;
-  final String provider;
+  final String? description;
+  final String floatBy;
   final List<String> eligibleBatchesIds;
   final String formId;
   final List<String> jdFiles;
+  final DateTime? deadline;
+  final DateTime floatTime;
+  final List<String>? updates;
+  final List<String>? students;
 
   CompanyModel({
     required this.id,
@@ -19,11 +24,16 @@ class CompanyModel {
     required this.positions,
     required this.ctc,
     this.location,
-    required this.provider,
+    this.description,
+    required this.floatBy,
     required this.eligibleBatchesIds,
     required this.formId,
     this.jdFiles = const [],
-  });
+    this.deadline,
+    DateTime? floatTime,
+    this.updates,
+    this.students,
+  }) : floatTime = floatTime ?? DateTime.now();
 
   CompanyModel copyWith({
     String? id,
@@ -31,10 +41,15 @@ class CompanyModel {
     List<String>? positions,
     List<String>? ctc,
     String? location,
-    String? provider,
+    String? description,
+    String? floatBy,
     List<String>? eligibleBatchesIds,
     String? formId,
     List<String>? jdFiles,
+    DateTime? deadline,
+    DateTime? floatTime,
+    List<String>? updates,
+    List<String>? students,
   }) {
     return CompanyModel(
       id: id ?? this.id,
@@ -42,10 +57,15 @@ class CompanyModel {
       positions: positions ?? this.positions,
       ctc: ctc ?? this.ctc,
       location: location ?? this.location,
-      provider: provider ?? this.provider,
+      description: description ?? this.description,
+      floatBy: floatBy ?? this.floatBy,
       eligibleBatchesIds: eligibleBatchesIds ?? this.eligibleBatchesIds,
       formId: formId ?? this.formId,
       jdFiles: jdFiles ?? this.jdFiles,
+      deadline: deadline ?? this.deadline,
+      floatTime: floatTime ?? this.floatTime,
+      updates: updates ?? this.updates,
+      students: students ?? this.students,
     );
   }
 
@@ -56,10 +76,15 @@ class CompanyModel {
       'positions': positions,
       'ctc': ctc,
       'location': location,
-      'provider': provider,
+      'description': description,
+      'floatBy': floatBy,
       'eligibleBatchesIds': eligibleBatchesIds,
       'formId': formId,
       'jdFiles': jdFiles,
+      'deadline': deadline?.toIso8601String(),
+      'floatTime': floatTime.toIso8601String(),
+      'updates': updates,
+      'students': students,
     };
   }
 
@@ -70,13 +95,27 @@ class CompanyModel {
       positions: List<String>.from((map['positions'] as List<String>)),
       ctc: List<String>.from((map['ctc'] as List<String>)),
       location: map['location'] != null ? map['location'] as String : null,
-      provider: map['provider'] as String,
+      description:
+          map['description'] != null ? map['description'] as String : null,
+      floatBy: map['floatBy'] as String,
       eligibleBatchesIds:
           List<String>.from((map['eligibleBatchesIds'] as List<String>)),
       formId: map['formId'] as String,
       jdFiles: map['jdFiles'] != null
           ? List<String>.from((map['jdFiles'] as List))
           : const [],
+      deadline: map['deadline'] != null
+          ? DateTime.parse(map['deadline'] as String)
+          : null,
+      floatTime: map['floatTime'] != null
+          ? DateTime.parse(map['floatTime'] as String)
+          : DateTime.now(),
+      updates: map['updates'] != null
+          ? List<String>.from((map['updates'] as List))
+          : null,
+      students: map['students'] != null
+          ? List<String>.from((map['students'] as List))
+          : null,
     );
   }
 
@@ -87,7 +126,7 @@ class CompanyModel {
 
   @override
   String toString() {
-    return 'CompanyModel(id: $id, name: $name, positions: $positions, ctc: $ctc, location: $location, provider: $provider, eligibleBatchesIds: $eligibleBatchesIds, formId: $formId, jdFiles: $jdFiles)';
+    return 'CompanyModel(id: $id, name: $name, positions: $positions, ctc: $ctc, location: $location, description: $description, floatBy: $floatBy, eligibleBatchesIds: $eligibleBatchesIds, formId: $formId, jdFiles: $jdFiles, deadline: $deadline, floatTime: $floatTime, updates: $updates, students: $students)';
   }
 
   @override
@@ -100,10 +139,15 @@ class CompanyModel {
         listEquals(other.positions, positions) &&
         listEquals(other.ctc, ctc) &&
         other.location == location &&
-        other.provider == provider &&
+        other.description == description &&
+        other.floatBy == floatBy &&
         listEquals(other.eligibleBatchesIds, eligibleBatchesIds) &&
         other.formId == formId &&
-        listEquals(other.jdFiles, jdFiles);
+        listEquals(other.jdFiles, jdFiles) &&
+        other.deadline == deadline &&
+        other.floatTime == floatTime &&
+        listEquals(other.updates, updates) &&
+        listEquals(other.students, students);
   }
 
   @override
@@ -113,9 +157,14 @@ class CompanyModel {
         positions.hashCode ^
         ctc.hashCode ^
         location.hashCode ^
-        provider.hashCode ^
+        description.hashCode ^
+        floatBy.hashCode ^
         eligibleBatchesIds.hashCode ^
         formId.hashCode ^
-        jdFiles.hashCode;
+        jdFiles.hashCode ^
+        deadline.hashCode ^
+        floatTime.hashCode ^
+        updates.hashCode ^
+        students.hashCode;
   }
 }
