@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
+import 'package:mainapp/features/companies/cubit/company_cubit.dart'
+    show CompanyCubit;
 import 'package:mainapp/features/companies/pages/company_pages.dart';
 import 'package:mainapp/features/configurations/pages/change_configuration.dart';
 import 'package:mainapp/features/forms/page/form_pages.dart';
@@ -57,19 +59,20 @@ class _HomePageState extends State<HomePage> {
                           icon: Icon(Icons.settings)),
                     ])
               : null,
-          body: (_selectedPage == 0)
-              ? RefreshIndicator(
-                  onRefresh: () async {
-                    context.read<AuthCubit>().checkAuthStatus();
-                  },
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: HomePageTab(),
-                  ),
-                )
-              : (_selectedPage == 1)
-                  ? SearchPageTab()
-                  : SettingsPageTab(),
+          body: RefreshIndicator(
+            onRefresh: () async {
+              context.read<CompanyCubit>().getAllCompanies();
+              context.read<AuthCubit>().checkAuthStatus();
+            },
+            child: SafeArea(
+              child: Container(
+                  child: (_selectedPage == 0)
+                      ? HomePageTab()
+                      : (_selectedPage == 1)
+                          ? SearchPageTab()
+                          : SettingsPageTab()),
+            ),
+          ),
           bottomNavigationBar: Padding(
             padding: const EdgeInsets.all(8.0).copyWith(bottom: 15),
             child: GNav(

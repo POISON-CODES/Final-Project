@@ -8,6 +8,8 @@ class UserModel {
   final Role role;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool masterDataFilled;
+  final bool defaultFormFilled;
 
   UserModel({
     required this.id,
@@ -17,6 +19,8 @@ class UserModel {
     required this.role,
     required this.createdAt,
     required this.updatedAt,
+    this.masterDataFilled = false,
+    this.defaultFormFilled = false,
   });
 
   // factory UserModel.fromAppwrite(User user) {
@@ -39,6 +43,8 @@ class UserModel {
     Role? role,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? masterDataFilled,
+    bool? defaultFormFilled,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -48,6 +54,8 @@ class UserModel {
       role: role ?? this.role,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      masterDataFilled: masterDataFilled ?? this.masterDataFilled,
+      defaultFormFilled: defaultFormFilled ?? this.defaultFormFilled,
     );
   }
 
@@ -57,6 +65,8 @@ class UserModel {
       'email': email,
       'phone_number': phoneNumber,
       'role': role.toString().split('.').last,
+      'master_data_filled': masterDataFilled,
+      'default_form_filled': defaultFormFilled,
     };
   }
 
@@ -69,6 +79,8 @@ class UserModel {
       role: Role.values.byName(map['role']),
       createdAt: DateTime.parse(map['\$createdAt']),
       updatedAt: DateTime.parse(map['\$updatedAt']),
+      masterDataFilled: map['master_data_filled'] ?? false,
+      defaultFormFilled: map['default_form_filled'] ?? false,
     );
   }
 
@@ -79,7 +91,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, role: $role, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, role: $role, createdAt: $createdAt, updatedAt: $updatedAt, masterDataFilled: $masterDataFilled, defaultFormFilled: $defaultFormFilled)';
   }
 
   @override
@@ -92,7 +104,9 @@ class UserModel {
         other.phoneNumber == phoneNumber &&
         other.role == role &&
         other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
+        other.updatedAt == updatedAt &&
+        other.masterDataFilled == masterDataFilled &&
+        other.defaultFormFilled == defaultFormFilled;
   }
 
   @override
@@ -103,6 +117,8 @@ class UserModel {
         phoneNumber.hashCode ^
         role.hashCode ^
         createdAt.hashCode ^
-        updatedAt.hashCode;
+        updatedAt.hashCode ^
+        masterDataFilled.hashCode ^
+        defaultFormFilled.hashCode;
   }
 }

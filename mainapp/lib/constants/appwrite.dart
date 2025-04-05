@@ -2,7 +2,9 @@ part of 'constants.dart';
 
 class Appwrite {
   // static String projectEndPoint = 'https://10.5.127.42/v1';
-  static String projectEndPoint = 'https://10.5.74.22/v1';
+  static String projectEndPoint = 'https://10.0.0.33/v1';
+  // static String projectEndPoint = 'https://10.5.54.255/v1';
+  // static String projectEndPoint = 'https://10.5.129.135/v1';
   static String projectName = '67a351b601aca4ed39db';
 
   static final Client client = Client()

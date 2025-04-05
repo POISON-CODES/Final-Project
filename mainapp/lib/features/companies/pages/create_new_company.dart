@@ -291,7 +291,6 @@ class _CreateNewCompanyPageState extends State<CreateNewCompanyPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => {
-            context.read<AuthCubit>().checkAuthStatus(),
             Navigator.of(context).pop()
           },
         ),

@@ -18,7 +18,7 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     try {
       emit(AuthLoading());
-      final user = await _authRepository.logInUser(
+      await _authRepository.logInUser(
         email: email,
         password: password,
       );
@@ -27,7 +27,7 @@ class AuthCubit extends Cubit<AuthState> {
           content: Text("Successfully logged in"),
         ),
       );
-      emit(AuthStudentAuthenticated(user));
+      await checkAuthStatus();
     } catch (e) {
       emit(AuthError(e.toString()));
     }

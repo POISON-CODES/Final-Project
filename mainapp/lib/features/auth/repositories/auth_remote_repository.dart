@@ -71,15 +71,19 @@ class AuthRemoteRepository {
         data: {
           'name': name,
           'email': email,
-          'phoneNumber': phoneNumber,
+          'phone_number': phoneNumber,
           'role': role.toString().split('.').last,
+          'master_data_filled': false,
+          'default_form_filled': false,
         },
       );
 
       return UserModel.fromMap({
         ...user.toMap(),
-        'phoneNumber': phoneNumber,
+        'phone_number': phoneNumber,
         'role': role.toString().split('.').last,
+        'master_data_filled': false,
+        'default_form_filled': false,
       });
     } on AppwriteException catch (e) {
       throw Exception('Signup failed: ${e.message}');
@@ -123,10 +127,10 @@ class AuthRemoteRepository {
       return docs.documents.map((doc) {
         return UserModel.fromMap({
           '\$id': doc.$id,
-          'name': "Aman Keswani",
-          'email': "aman@gmail.com",
-          'phoneNumber': "+919826000000",
-          'role': Role.admin.name,
+          'name': doc.data['name'],
+          'email': doc.data['email'],
+          'phoneNumber': doc.data['phoneNumber'],
+          'role': doc.data['role'],
           '\$createdAt': doc.$createdAt,
           '\$updatedAt': doc.$updatedAt,
         });
@@ -146,5 +150,30 @@ class AuthRemoteRepository {
 
   Future<List<UserModel>> getAllCoordinators() async {
     return getUsersByRole(Role.coordinator);
+  }
+
+  Future<void> updateUserFormStatus({
+    required String userId,
+    bool? masterDataFilled,
+    bool? defaultFormFilled,
+  }) async {
+    try {
+      final Map<String, dynamic> data = {};
+      if (masterDataFilled != null) {
+        data['master_data_filled'] = masterDataFilled;
+      }
+      if (defaultFormFilled != null) {
+        data['default_form_filled'] = defaultFormFilled;
+      }
+
+      await Appwrite.databases.updateDocument(
+        databaseId: DatabaseIds.crcDatabase,
+        collectionId: CollectionsIds.usersCollection,
+        documentId: userId,
+        data: data,
+      );
+    } catch (e) {
+      throw Exception('Failed to update user form status: $e');
+    }
   }
 }

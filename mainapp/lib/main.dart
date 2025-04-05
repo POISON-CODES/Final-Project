@@ -4,6 +4,7 @@ import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
 import 'package:mainapp/features/auth/pages/sign_up.dart';
 import 'package:mainapp/features/companies/cubit/company_cubit.dart';
 import 'package:mainapp/features/configurations/cubit/configuration_cubit.dart';
+import 'package:mainapp/features/files/cubit/file_cubit.dart';
 import 'package:mainapp/features/forms/cubit/form_cubit.dart';
 import 'package:mainapp/features/home/pages/home_page.dart';
 import 'package:mainapp/features/updates/cubit/update_cubit.dart';
@@ -15,6 +16,7 @@ void main() {
     BlocProvider(create: (_) => FormCubit()),
     BlocProvider(create: (_) => CompanyCubit()),
     BlocProvider(create: (_) => UpdateCubit()),
+    BlocProvider(create: (_) => FileCubit()),
   ], child: const MyApp()));
 }
 

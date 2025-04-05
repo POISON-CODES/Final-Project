@@ -225,6 +225,6 @@ class ConfigurationDetailPage extends StatelessWidget {
         return Colors.blue;
       case GraduationStatus.phd:
         return Colors.purple;
-      }
+    }
   }
 }
