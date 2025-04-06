@@ -4,7 +4,9 @@ class UserDetailModel {
   final String id;
   final String enrollmentNumber;
   final String firstName;
+  final String middleName;
   final String lastName;
+  final String batchId;
   final String gender;
   final String phoneNumber;
   final String emailAddress;
@@ -15,7 +17,7 @@ class UserDetailModel {
   final String graduationDegree;
   final String graduationSpecialization;
   final String graduationYearOfPassing;
-  final String graduationePercentage;
+  final String graduationPercentage;
   final String mastersDegree;
   final String mastersSpecialization;
   final String mastersYearOfPassout;
@@ -31,7 +33,9 @@ class UserDetailModel {
     required this.id,
     required this.enrollmentNumber,
     required this.firstName,
+    required this.middleName,
     required this.lastName,
+    required this.batchId,
     required this.gender,
     required this.phoneNumber,
     required this.emailAddress,
@@ -42,7 +46,7 @@ class UserDetailModel {
     required this.graduationDegree,
     required this.graduationSpecialization,
     required this.graduationYearOfPassing,
-    required this.graduationePercentage,
+    required this.graduationPercentage,
     required this.mastersDegree,
     required this.mastersSpecialization,
     required this.mastersYearOfPassout,
@@ -59,7 +63,9 @@ class UserDetailModel {
     String? id,
     String? enrollmentNumber,
     String? firstName,
+    String? middleName,
     String? lastName,
+    String? batchId,
     String? gender,
     String? phoneNumber,
     String? emailAddress,
@@ -70,7 +76,7 @@ class UserDetailModel {
     String? graduationDegree,
     String? graduationSpecialization,
     String? graduationYearOfPassing,
-    String? graduationePercentage,
+    String? graduationPercentage,
     String? mastersDegree,
     String? mastersSpecialization,
     String? mastersYearOfPassout,
@@ -86,7 +92,9 @@ class UserDetailModel {
       id: id ?? this.id,
       enrollmentNumber: enrollmentNumber ?? this.enrollmentNumber,
       firstName: firstName ?? this.firstName,
+      middleName: middleName ?? this.middleName,
       lastName: lastName ?? this.lastName,
+      batchId: batchId ?? this.batchId,
       gender: gender ?? this.gender,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       emailAddress: emailAddress ?? this.emailAddress,
@@ -99,8 +107,7 @@ class UserDetailModel {
           graduationSpecialization ?? this.graduationSpecialization,
       graduationYearOfPassing:
           graduationYearOfPassing ?? this.graduationYearOfPassing,
-      graduationePercentage:
-          graduationePercentage ?? this.graduationePercentage,
+      graduationPercentage: graduationPercentage ?? this.graduationPercentage,
       mastersDegree: mastersDegree ?? this.mastersDegree,
       mastersSpecialization:
           mastersSpecialization ?? this.mastersSpecialization,
@@ -117,9 +124,12 @@ class UserDetailModel {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
+      'id': id,
       'enrollmentNumber': enrollmentNumber,
       'firstName': firstName,
+      'middleName': middleName,
       'lastName': lastName,
+      'batchId': batchId,
       'gender': gender,
       'phoneNumber': phoneNumber,
       'emailAddress': emailAddress,
@@ -130,7 +140,7 @@ class UserDetailModel {
       'graduationDegree': graduationDegree,
       'graduationSpecialization': graduationSpecialization,
       'graduationYearOfPassing': graduationYearOfPassing,
-      'graduationePercentage': graduationePercentage,
+      'graduationPercentage': graduationPercentage,
       'mastersDegree': mastersDegree,
       'mastersSpecialization': mastersSpecialization,
       'mastersYearOfPassout': mastersYearOfPassout,
@@ -149,30 +159,30 @@ class UserDetailModel {
       id: map['id'] ?? '',
       enrollmentNumber: map['enrollmentNumber'] ?? '',
       firstName: map['firstName'] ?? '',
+      middleName: map['middleName'] ?? '',
       lastName: map['lastName'] ?? '',
+      batchId: map['batchId'] ?? '',
       gender: map['gender'] ?? '',
       phoneNumber: map['phoneNumber'] ?? '',
       emailAddress: map['emailAddress'] ?? '',
       collegeLocation: map['collegeLocation'] ?? '',
-      preferredLocation:
-          List<String>.from((map['preferredLocation'] as List<String>)),
+      preferredLocation: List<String>.from(map['preferredLocation'] ?? []),
       std10Percentage: map['std10Percentage'] ?? '',
       std12Percentage: map['std12Percentage'] ?? '',
       graduationDegree: map['graduationDegree'] ?? '',
       graduationSpecialization: map['graduationSpecialization'] ?? '',
       graduationYearOfPassing: map['graduationYearOfPassing'] ?? '',
-      graduationePercentage: map['graduationePercentage'] ?? '',
+      graduationPercentage: map['graduationPercentage'] ?? '',
       mastersDegree: map['mastersDegree'] ?? '',
       mastersSpecialization: map['mastersSpecialization'] ?? '',
       mastersYearOfPassout: map['mastersYearOfPassout'] ?? '',
       mastersPercentage: map['mastersPercentage'] ?? '',
-      priorExperience: map['priorExperience'] as bool,
-      experienceInMonths: map['experienceInMonths'] as int,
+      priorExperience: map['priorExperience'] ?? false,
+      experienceInMonths: map['experienceInMonths'] ?? 0,
       resumeLink: map['resumeLink'] ?? '',
       technicalWorkLink: map['technicalWorkLink'] ?? '',
-      positionApplied:
-          List<String>.from((map['positionApplied'] as List<String>)),
-      department: Department.values.byName(map['department'] as String),
+      positionApplied: List<String>.from(map['positionApplied'] ?? []),
+      department: Department.values.byName(map['department'] ?? ''),
     );
   }
 
@@ -183,7 +193,7 @@ class UserDetailModel {
 
   @override
   String toString() {
-    return 'UserDetailModel(id: $id, enrollmentNumber: $enrollmentNumber, firstName: $firstName, lastName: $lastName, gender: $gender, phoneNumber: $phoneNumber, emailAddress: $emailAddress, collegeLocation: $collegeLocation, preferredLocation: $preferredLocation, std10Percentage: $std10Percentage, std12Percentage: $std12Percentage, graduationDegree: $graduationDegree, graduationSpecialization: $graduationSpecialization, graduationYearOfPassing: $graduationYearOfPassing, graduationePercentage: $graduationePercentage, mastersDegree: $mastersDegree, mastersSpecialization: $mastersSpecialization, mastersYearOfPassout: $mastersYearOfPassout, mastersPercentage: $mastersPercentage, priorExperience: $priorExperience, experienceInMonths: $experienceInMonths, resumeLink: $resumeLink, technicalWorkLink: $technicalWorkLink, positionApplied: $positionApplied, department: $department)';
+    return 'UserDetailModel(id: $id, enrollmentNumber: $enrollmentNumber, firstName: $firstName, middleName: $middleName, lastName: $lastName, batchId: $batchId, gender: $gender, phoneNumber: $phoneNumber, emailAddress: $emailAddress, collegeLocation: $collegeLocation, preferredLocation: $preferredLocation, std10Percentage: $std10Percentage, std12Percentage: $std12Percentage, graduationDegree: $graduationDegree, graduationSpecialization: $graduationSpecialization, graduationYearOfPassing: $graduationYearOfPassing, graduationPercentage: $graduationPercentage, mastersDegree: $mastersDegree, mastersSpecialization: $mastersSpecialization, mastersYearOfPassout: $mastersYearOfPassout, mastersPercentage: $mastersPercentage, priorExperience: $priorExperience, experienceInMonths: $experienceInMonths, resumeLink: $resumeLink, technicalWorkLink: $technicalWorkLink, positionApplied: $positionApplied, department: $department)';
   }
 
   @override
@@ -194,7 +204,9 @@ class UserDetailModel {
     return other.id == id &&
         other.enrollmentNumber == enrollmentNumber &&
         other.firstName == firstName &&
+        other.middleName == middleName &&
         other.lastName == lastName &&
+        other.batchId == batchId &&
         other.gender == gender &&
         other.phoneNumber == phoneNumber &&
         other.emailAddress == emailAddress &&
@@ -205,7 +217,7 @@ class UserDetailModel {
         other.graduationDegree == graduationDegree &&
         other.graduationSpecialization == graduationSpecialization &&
         other.graduationYearOfPassing == graduationYearOfPassing &&
-        other.graduationePercentage == graduationePercentage &&
+        other.graduationPercentage == graduationPercentage &&
         other.mastersDegree == mastersDegree &&
         other.mastersSpecialization == mastersSpecialization &&
         other.mastersYearOfPassout == mastersYearOfPassout &&
@@ -223,7 +235,9 @@ class UserDetailModel {
     return id.hashCode ^
         enrollmentNumber.hashCode ^
         firstName.hashCode ^
+        middleName.hashCode ^
         lastName.hashCode ^
+        batchId.hashCode ^
         gender.hashCode ^
         phoneNumber.hashCode ^
         emailAddress.hashCode ^
@@ -234,7 +248,7 @@ class UserDetailModel {
         graduationDegree.hashCode ^
         graduationSpecialization.hashCode ^
         graduationYearOfPassing.hashCode ^
-        graduationePercentage.hashCode ^
+        graduationPercentage.hashCode ^
         mastersDegree.hashCode ^
         mastersSpecialization.hashCode ^
         mastersYearOfPassout.hashCode ^

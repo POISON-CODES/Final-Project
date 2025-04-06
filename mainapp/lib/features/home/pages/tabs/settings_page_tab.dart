@@ -14,34 +14,26 @@ class SettingsPageTab extends StatelessWidget {
         }
 
         final user = (state as dynamic).user;
+
         return Scaffold(
-          appBar: CustomAppBar(
-            title: "Settings",
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 10.0),
-                child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.edit),
-                ),
-              )
-            ],
+          appBar: AppBar(
+            title: const Text('Settings'),
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildFormButton(
                   context,
                   title: 'Fill Master Data',
-                  icon: Icons.data_object,
+                  icon: Icons.person,
                   isFilled: user.masterDataFilled,
                   onTap: () {
-                    // TODO: Navigate to master data form
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Master data form coming soon!'),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MasterDataFormPage(),
                       ),
                     );
                   },
@@ -53,10 +45,10 @@ class SettingsPageTab extends StatelessWidget {
                   icon: Icons.description,
                   isFilled: user.defaultFormFilled,
                   onTap: () {
-                    // TODO: Navigate to default form
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Default form coming soon!'),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DefaultFormPage(),
                       ),
                     );
                   },
@@ -68,6 +60,63 @@ class SettingsPageTab extends StatelessWidget {
       },
     );
   }
+
+//   Widget _buildFormButton(
+//     BuildContext context, {
+//     required String title,
+//     required IconData icon,
+//     required bool isCompleted,
+//     required VoidCallback onTap,
+//   }) {
+//     return Card(
+//       child: InkWell(
+//         onTap: onTap,
+//         child: Padding(
+//           padding: const EdgeInsets.all(16),
+//           child: Row(
+//             children: [
+//               Icon(icon, size: 32),
+//               const SizedBox(width: 16),
+//               Expanded(
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Text(
+//                       title,
+//                       style: Theme.of(context).textTheme.titleMedium,
+//                     ),
+//                     const SizedBox(height: 4),
+//                     Text(
+//                       isCompleted ? 'Completed' : 'Not Completed',
+//                       style: Theme.of(context).textTheme.bodySmall,
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//               Container(
+//                 padding: const EdgeInsets.symmetric(
+//                   horizontal: 12,
+//                   vertical: 6,
+//                 ),
+//                 decoration: BoxDecoration(
+//                   color: isCompleted ? Colors.green : Colors.orange,
+//                   borderRadius: BorderRadius.circular(16),
+//                 ),
+//                 child: Text(
+//                   isCompleted ? 'Done' : 'Fill Now',
+//                   style: const TextStyle(
+//                     color: Colors.white,
+//                     fontWeight: FontWeight.bold,
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
   Widget _buildFormButton(
     BuildContext context, {

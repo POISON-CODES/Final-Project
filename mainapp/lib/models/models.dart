@@ -17,3 +17,5 @@ part 'picked_files.dart';
 part 'update_model.dart';
 part 'user_detail_model.dart';
 part 'user_model.dart';
+part 'master_data_model.dart';
+part 'request_model.dart';
