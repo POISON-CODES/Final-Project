@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
-import 'package:mainapp/features/companies/cubit/company_cubit.dart'
-    show CompanyCubit;
 import 'package:mainapp/features/companies/pages/company_pages.dart';
 import 'package:mainapp/features/configurations/pages/change_configuration.dart';
 import 'package:mainapp/features/forms/page/form_pages.dart';
@@ -61,16 +59,19 @@ class _HomePageState extends State<HomePage> {
               : null,
           body: RefreshIndicator(
             onRefresh: () async {
-              context.read<CompanyCubit>().getAllCompanies();
               context.read<AuthCubit>().checkAuthStatus();
             },
             child: SafeArea(
               child: Container(
                   child: (_selectedPage == 0)
-                      ? HomePageTab()
+                      ? const CompaniesPageTab()
                       : (_selectedPage == 1)
-                          ? SearchPageTab()
-                          : SettingsPageTab()),
+                          ? const UsersPageTab()
+                          : (_selectedPage == 2)
+                              ? const RequestsPageTab()
+                              : (_selectedPage == 3)
+                                  ? const StatsPageTab()
+                                  : const SettingsPageTab()),
             ),
           ),
           bottomNavigationBar: Padding(
@@ -87,15 +88,23 @@ class _HomePageState extends State<HomePage> {
               tabActiveBorder: Border.all(),
               tabBorderRadius: 100,
               textSize: 20,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              tabs: [
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              tabs: const [
                 GButton(
-                  icon: CupertinoIcons.home,
-                  text: 'Home',
+                  icon: CupertinoIcons.building_2_fill,
+                  text: 'Companies',
                 ),
                 GButton(
-                  icon: CupertinoIcons.search,
-                  text: 'Search',
+                  icon: CupertinoIcons.person_2_fill,
+                  text: 'Users',
+                ),
+                GButton(
+                  icon: CupertinoIcons.doc_text,
+                  text: 'Requests',
+                ),
+                GButton(
+                  icon: CupertinoIcons.chart_bar,
+                  text: 'Stats',
                 ),
                 GButton(
                   icon: CupertinoIcons.gear,

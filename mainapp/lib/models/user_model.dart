@@ -9,7 +9,6 @@ class UserModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool masterDataFilled;
-  final bool defaultFormFilled;
 
   UserModel({
     required this.id,
@@ -20,7 +19,6 @@ class UserModel {
     required this.createdAt,
     required this.updatedAt,
     this.masterDataFilled = false,
-    this.defaultFormFilled = false,
   });
 
   // factory UserModel.fromAppwrite(User user) {
@@ -44,7 +42,6 @@ class UserModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? masterDataFilled,
-    bool? defaultFormFilled,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -55,7 +52,6 @@ class UserModel {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       masterDataFilled: masterDataFilled ?? this.masterDataFilled,
-      defaultFormFilled: defaultFormFilled ?? this.defaultFormFilled,
     );
   }
 
@@ -66,7 +62,6 @@ class UserModel {
       'phone_number': phoneNumber,
       'role': role.toString().split('.').last,
       'master_data_filled': masterDataFilled,
-      'default_form_filled': defaultFormFilled,
     };
   }
 
@@ -75,12 +70,11 @@ class UserModel {
       id: map['\$id'] ?? '',
       name: map['name'] ?? '',
       email: map['email'] ?? '',
-      phoneNumber: map['phone_number'] ?? '',
+      phoneNumber: map['phoneNumber'] ?? '',
       role: Role.values.byName(map['role']),
       createdAt: DateTime.parse(map['\$createdAt']),
       updatedAt: DateTime.parse(map['\$updatedAt']),
-      masterDataFilled: map['master_data_filled'] ?? false,
-      defaultFormFilled: map['default_form_filled'] ?? false,
+      masterDataFilled: map['masterDataFilled'] ?? false,
     );
   }
 
@@ -91,7 +85,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, role: $role, createdAt: $createdAt, updatedAt: $updatedAt, masterDataFilled: $masterDataFilled, defaultFormFilled: $defaultFormFilled)';
+    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, role: $role, createdAt: $createdAt, updatedAt: $updatedAt, masterDataFilled: $masterDataFilled)';
   }
 
   @override
@@ -105,8 +99,7 @@ class UserModel {
         other.role == role &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt &&
-        other.masterDataFilled == masterDataFilled &&
-        other.defaultFormFilled == defaultFormFilled;
+        other.masterDataFilled == masterDataFilled;
   }
 
   @override
@@ -118,7 +111,6 @@ class UserModel {
         role.hashCode ^
         createdAt.hashCode ^
         updatedAt.hashCode ^
-        masterDataFilled.hashCode ^
-        defaultFormFilled.hashCode;
+        masterDataFilled.hashCode;
   }
 }

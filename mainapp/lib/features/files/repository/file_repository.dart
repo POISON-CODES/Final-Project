@@ -1,26 +1,27 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart' as models;
 import 'package:mainapp/constants/constants.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
 
 class FileRepository {
   final Storage _storage = Appwrite.storage;
 
   FileRepository();
 
-  Future<String> uploadFile(String filePath, String fileName) async {
+  Future<String> uploadFile(
+      Uint8List fileBytes, String fileName, String bucketId) async {
     try {
       final file = await _storage.createFile(
-        bucketId: Buckets.jdFilesBucket,
+        bucketId: bucketId,
         fileId: ID.unique(),
-        file: InputFile.fromPath(
-          path: filePath,
+        file: InputFile.fromBytes(
+          bytes: fileBytes,
           filename: fileName,
+          contentType: 'application/pdf', // Assuming PDF for resume
         ),
       );
       return file.$id;
     } catch (e) {
-      debugPrint('Error uploading file: $e');
       rethrow;
     }
   }
@@ -32,7 +33,6 @@ class FileRepository {
         fileId: fileId,
       );
     } catch (e) {
-      debugPrint('Error getting file: $e');
       rethrow;
     }
   }
@@ -44,7 +44,6 @@ class FileRepository {
         fileId: fileId,
       );
     } catch (e) {
-      debugPrint('Error deleting file: $e');
       rethrow;
     }
   }

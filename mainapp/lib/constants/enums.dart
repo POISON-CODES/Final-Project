@@ -1,10 +1,10 @@
 part of 'constants.dart';
 
-enum Role { admin, coordinator, student }
+enum Role { student, coordinator, admin }
 
 enum Priority { low, medium, high }
 
-enum FieldType { text, file, dropDown, multiSelect }
+enum FieldType { text, dropdown, file, multiselect }
 
 enum RequestType {
   masterData,
@@ -51,6 +51,23 @@ enum Department {
   aib,
   asft,
   asas
+}
+
+enum RequestStatus {
+  pending,
+  approved,
+  rejected;
+
+  String get displayName {
+    switch (this) {
+      case RequestStatus.pending:
+        return 'Pending';
+      case RequestStatus.approved:
+        return 'Approved';
+      case RequestStatus.rejected:
+        return 'Rejected';
+    }
+  }
 }
 
 enum GraduationStatus { ug, pg, phd }

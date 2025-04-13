@@ -232,11 +232,59 @@ class CompanyRepository {
           contentType: contentType,
         ),
       );
-      print("result: $result");
 
       return result.$id;
     } catch (e) {
-      print("error: $e");
+      throw e.toString();
+    }
+  }
+
+  Future<List<CompanyModel>> getActiveCompanies() async {
+    try {
+      // Get current time in ISO format
+      final now = DateTime.now().toIso8601String();
+
+      // Query documents where deadline is greater than current time
+      DocumentList documents = await Appwrite.databases.listDocuments(
+        databaseId: DatabaseIds.crcDatabase,
+        collectionId: CollectionsIds.companiesCollection,
+        queries: [
+          Query.greaterThan('deadline', now),
+          Query.isNotNull('deadline'),
+        ],
+      );
+
+      List<CompanyModel> companies = documents.documents.map((doc) {
+        return CompanyModel(
+          id: doc.$id,
+          name: doc.data['name'],
+          positions: List<String>.from(doc.data['positions']),
+          ctc: List<String>.from(doc.data['ctc']),
+          location: doc.data['location'],
+          description: doc.data['description'],
+          floatBy: doc.data['floatBy'],
+          eligibleBatchesIds: List<String>.from(doc.data['eligibleBatchesIds']),
+          formId: doc.data['formId'],
+          jdFiles: doc.data['jdFiles'] != null
+              ? List<String>.from(doc.data['jdFiles'])
+              : const [],
+          deadline: doc.data['deadline'] != null
+              ? DateTime.parse(doc.data['deadline'] as String)
+              : null,
+          floatTime: doc.data['floatTime'] != null
+              ? DateTime.parse(doc.data['floatTime'] as String)
+              : DateTime.now(),
+          updates: doc.data['updates'] != null
+              ? List<String>.from(doc.data['updates'])
+              : null,
+          students: doc.data['students'] != null
+              ? List<String>.from(doc.data['students'])
+              : null,
+        );
+      }).toList();
+
+      return companies;
+    } catch (e) {
       throw e.toString();
     }
   }

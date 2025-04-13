@@ -8,6 +8,7 @@ import 'package:mainapp/features/files/cubit/file_cubit.dart';
 import 'package:mainapp/features/forms/cubit/form_cubit.dart';
 import 'package:mainapp/features/home/pages/home_page.dart';
 import 'package:mainapp/features/master_data/cubit/master_data_cubit.dart';
+import 'package:mainapp/features/requests/cubit/request_cubit.dart';
 import 'package:mainapp/features/updates/cubit/update_cubit.dart';
 
 void main() {
@@ -19,6 +20,7 @@ void main() {
     BlocProvider(create: (_) => UpdateCubit()),
     BlocProvider(create: (_) => FileCubit()),
     BlocProvider(create: (_) => MasterDataCubit()),
+    BlocProvider(create: (_) => RequestCubit()),
   ], child: const MyApp()));
 }
 

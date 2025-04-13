@@ -9,17 +9,47 @@ class RequestRepository {
       DocumentList documents = await Appwrite.databases.listDocuments(
         databaseId: DatabaseIds.crcDatabase,
         collectionId: CollectionsIds.requestsCollection,
-        queries: [
-          Query.orderDesc('createdAt'),
-        ],
       );
 
-      return documents.documents
-          .map((doc) => RequestModel.fromJson({
-                'id': doc.$id,
-                ...doc.data,
-              }))
-          .toList();
+      List<RequestModel> requests = [];
+      for (var doc in documents.documents) {
+        final request = RequestModel.fromJson({
+          'id': doc.$id,
+          ...doc.data,
+        });
+
+        // Get approver name if exists
+        if (request.approvedBy != null) {
+          try {
+            final approver = await Appwrite.databases.getDocument(
+              databaseId: DatabaseIds.crcDatabase,
+              collectionId: CollectionsIds.usersCollection,
+              documentId: request.approvedBy!,
+            );
+            request.approvedBy = approver.data['name'] as String;
+          } catch (e) {
+            // If user not found, keep the ID
+          }
+        }
+
+        // Get rejecter name if exists
+        if (request.rejectedBy != null) {
+          try {
+            final rejecter = await Appwrite.databases.getDocument(
+              databaseId: DatabaseIds.crcDatabase,
+              collectionId: CollectionsIds.usersCollection,
+              documentId: request.rejectedBy!,
+            );
+            request.rejectedBy = rejecter.data['name'] as String;
+          } catch (e) {
+            // If user not found, keep the ID
+          }
+        }
+
+        requests.add(request);
+      }
+
+      return requests;
     } catch (e) {
       throw e.toString();
     }
@@ -86,12 +116,12 @@ class RequestRepository {
     }
   }
 
-  Future<RequestModel> createRequest(RequestModel request) async {
+  Future<RequestModel> createRequest(RequestModel request, String id) async {
     try {
       Document doc = await Appwrite.databases.createDocument(
         databaseId: DatabaseIds.crcDatabase,
         collectionId: CollectionsIds.requestsCollection,
-        documentId: ID.unique(),
+        documentId: id,
         data: request.toJson(),
       );
 
@@ -104,13 +134,14 @@ class RequestRepository {
     }
   }
 
-  Future<RequestModel> updateRequest(RequestModel request) async {
+  Future<RequestModel> updateRequest(
+      String id, Map<String, dynamic> data) async {
     try {
       Document doc = await Appwrite.databases.updateDocument(
         databaseId: DatabaseIds.crcDatabase,
         collectionId: CollectionsIds.requestsCollection,
-        documentId: request.id,
-        data: request.toJson(),
+        documentId: id,
+        data: data,
       );
 
       return RequestModel.fromJson({
@@ -143,7 +174,6 @@ class RequestRepository {
         data: {
           'status': 'approved',
           'approvedBy': approvedBy,
-          'updatedAt': DateTime.now().toIso8601String(),
         },
       );
 
@@ -167,7 +197,6 @@ class RequestRepository {
           'status': 'rejected',
           'rejectedBy': rejectedBy,
           'rejectionReason': reason,
-          'updatedAt': DateTime.now().toIso8601String(),
         },
       );
 

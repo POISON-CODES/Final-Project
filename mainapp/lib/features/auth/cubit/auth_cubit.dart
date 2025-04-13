@@ -38,24 +38,22 @@ class AuthCubit extends Cubit<AuthState> {
     required String email,
     required String password,
     required String phoneNumber,
-    Role role = Role.student,
     required BuildContext context,
   }) async {
     try {
       emit(AuthLoading());
-      final user = await _authRepository.createUser(
+      await _authRepository.createUser(
         name: name,
         email: email,
         password: password,
         phoneNumber: phoneNumber,
-        role: role,
       );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Account Created! "),
+          content: Text("Account Created!"),
         ),
       );
-      emit(AuthStudentAuthenticated(user));
+      emit(AuthAccountCreated());
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -116,6 +114,23 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthLoading());
       final users = await _authRepository.getAllCoordinators();
       emit(UsersListLoaded(users));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> updateUserFormStatus({
+    required String userId,
+    bool? masterDataFilled,
+    bool? defaultFormFilled,
+  }) async {
+    try {
+      emit(AuthLoading());
+      await _authRepository.updateUserFormStatus(
+        userId: userId,
+        masterDataFilled: masterDataFilled,
+      );
+      await checkAuthStatus(); // Refresh the auth state to reflect the changes
     } catch (e) {
       emit(AuthError(e.toString()));
     }

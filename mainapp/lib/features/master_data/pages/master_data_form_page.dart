@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:mainapp/custom/widgets/custom_global_widgets.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
 import 'package:mainapp/features/configurations/cubit/configuration_cubit.dart';
+import 'package:mainapp/features/files/cubit/file_cubit.dart';
 import 'package:mainapp/features/master_data/cubit/master_data_cubit.dart';
 import 'package:mainapp/models/models.dart';
-import 'package:mainapp/constants/constants.dart' show GraduationStatus;
+import 'package:mainapp/constants/constants.dart';
+import 'package:mainapp/features/requests/cubit/request_cubit.dart';
 
 class MasterDataFormPage extends StatefulWidget {
   const MasterDataFormPage({super.key});
@@ -15,9 +19,9 @@ class MasterDataFormPage extends StatefulWidget {
 
 class _MasterDataFormPageState extends State<MasterDataFormPage> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _firstNameController;
-  late final TextEditingController _middleNameController;
-  late final TextEditingController _lastNameController;
+  final _firstNameController = TextEditingController();
+  final _middleNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   late final TextEditingController _enrollmentNumberController;
   late final TextEditingController _phoneNumberController;
   late final TextEditingController _emailAddressController;
@@ -35,7 +39,6 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
   late final TextEditingController _resumeLinkController;
   late final TextEditingController _technicalWorkLinkController;
   late final TextEditingController _linkedinProfileLinkController;
-  late final TextEditingController _githubProfileLinkController;
   late final TextEditingController _std10thBoardController;
   late final TextEditingController _std10thPercentageController;
   late final TextEditingController _std12thBoardController;
@@ -55,24 +58,24 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
   late final TextEditingController _activeBackLogsController;
   late final TextEditingController _dateOfBirthController;
 
-  String _selectedGender = 'Male';
-  String _selectedDepartment = 'Computer Science';
   String? _selectedBatchId;
-  ConfigurationModel? _selectedBatch;
-  String? _priorExperience;
+  String? _selectedGender;
+  bool _priorExperience = false;
   DateTime? _selectedDob;
-  bool _mastersFieldsEnabled = true;
   bool _graduationFieldsEnabled = true;
+  bool _mastersFieldsEnabled = true;
+  GraduationStatus? _selectedBatchStatus;
+  List<PlatformFile> _selectedResumeFiles = [];
+  String? _uploadedResumeId;
+  String? _selectedDepartment;
+  final List<String> _genderOptions = ['Male', 'Female', 'Other'];
 
   @override
   void initState() {
     super.initState();
-    _firstNameController = TextEditingController();
-    _middleNameController = TextEditingController();
-    _lastNameController = TextEditingController();
-    _enrollmentNumberController = TextEditingController();
     _phoneNumberController = TextEditingController();
     _emailAddressController = TextEditingController();
+    _enrollmentNumberController = TextEditingController();
     _collegeLocationController = TextEditingController();
     _preferredLocationController = TextEditingController();
     _graduationDegreeController = TextEditingController();
@@ -87,7 +90,6 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
     _resumeLinkController = TextEditingController();
     _technicalWorkLinkController = TextEditingController();
     _linkedinProfileLinkController = TextEditingController();
-    _githubProfileLinkController = TextEditingController();
     _std10thBoardController = TextEditingController();
     _std10thPercentageController = TextEditingController();
     _std12thBoardController = TextEditingController();
@@ -111,16 +113,19 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
     context.read<ConfigurationCubit>().getAllConfigurations();
 
     // Pre-fill user details
-    final authState = context.read<AuthCubit>().state;
+    final AuthState authState = context.read<AuthCubit>().state;
     if (authState is AuthStudentAuthenticated) {
       _phoneNumberController.text = authState.user.phoneNumber;
       _emailAddressController.text = authState.user.email;
+      context.read<MasterDataCubit>().getMasterDataById(authState.user.id);
     } else if (authState is AuthCoordinatorAuthenticated) {
       _phoneNumberController.text = authState.user.phoneNumber;
       _emailAddressController.text = authState.user.email;
+      context.read<MasterDataCubit>().getMasterDataById(authState.user.id);
     } else if (authState is AuthAdminAuthenticated) {
       _phoneNumberController.text = authState.user.phoneNumber;
       _emailAddressController.text = authState.user.email;
+      context.read<MasterDataCubit>().getMasterDataById(authState.user.id);
     }
   }
 
@@ -146,7 +151,6 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
     _resumeLinkController.dispose();
     _technicalWorkLinkController.dispose();
     _linkedinProfileLinkController.dispose();
-    _githubProfileLinkController.dispose();
     _std10thBoardController.dispose();
     _std10thPercentageController.dispose();
     _std12thBoardController.dispose();
@@ -168,7 +172,30 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
     super.dispose();
   }
 
-  void _submitForm() {
+  Future<void> _uploadResume() async {
+    try {
+      if (_selectedResumeFiles.isNotEmpty) {
+        final file = _selectedResumeFiles.first;
+        if (file.bytes != null) {
+          final String fileId = await context.read<FileCubit>().uploadFile(
+                file.bytes!,
+                file.name,
+                Buckets.defaultResumeBucket,
+              );
+          setState(() {
+            _uploadedResumeId = fileId;
+            _resumeLinkController.text = fileId;
+          });
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error uploading resume: $e")),
+      );
+    }
+  }
+
+  Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedBatchId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -177,14 +204,91 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
         return;
       }
 
+      if (_selectedGender == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a gender')),
+        );
+        return;
+      }
+
+      // Show uploading dialog if resume is selected
+      if (_selectedResumeFiles.isNotEmpty && _uploadedResumeId == null) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return const AlertDialog(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text("Uploading Resume..."),
+                ],
+              ),
+            );
+          },
+        );
+
+        // Upload resume and wait for completion
+        try {
+          await _uploadResume();
+          Navigator.of(context).pop();
+        } catch (e) {
+          // Close the uploading dialog
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error uploading resume: $e")),
+          );
+          return;
+        }
+      }
+
+      // Get current user data from auth state
+      final authState = context.read<AuthCubit>().state;
+      Map<String, dynamic> userData = {};
+      if (authState is AuthStudentAuthenticated) {
+        userData = {
+          'id': authState.user.id,
+          'name': authState.user.name,
+          'email': authState.user.email,
+          'phoneNumber': authState.user.phoneNumber,
+          'role': authState.user.role.toString(),
+        };
+      } else if (authState is AuthCoordinatorAuthenticated) {
+        userData = {
+          'id': authState.user.id,
+          'name': authState.user.name,
+          'email': authState.user.email,
+          'phoneNumber': authState.user.phoneNumber,
+          'role': authState.user.role.toString(),
+        };
+      } else if (authState is AuthAdminAuthenticated) {
+        userData = {
+          'id': authState.user.id,
+          'name': authState.user.name,
+          'email': authState.user.email,
+          'phoneNumber': authState.user.phoneNumber,
+          'role': authState.user.role.toString(),
+        };
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('You must be logged in to submit the form')),
+        );
+        return;
+      }
+
+      // Submit master data
+      print(_selectedDob);
       final masterData = MasterDataModel(
-        id: '',
+        id: userData['id'],
         firstName: _firstNameController.text,
         middleName: _middleNameController.text,
         lastName: _lastNameController.text,
         enrollmentNumber: _enrollmentNumberController.text,
         batchId: _selectedBatchId!,
-        gender: _selectedGender,
+        gender: _selectedGender!,
         phoneNumber: _phoneNumberController.text,
         emailAddress: _emailAddressController.text,
         collegeLocation: _collegeLocationController.text,
@@ -197,14 +301,13 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
         mastersSpecialization: _mastersSpecializationController.text,
         mastersYearOfPassing: _mastersYearOfPassingController.text,
         mastersPercentage: _mastersPercentageController.text,
-        priorExperience: _priorExperience!,
+        priorExperience: _priorExperience,
         experienceInMonths: _experienceInMonthsController.text,
-        resumeLink: _resumeLinkController.text,
+        resumeLink: _uploadedResumeId ?? _resumeLinkController.text,
         technicalWorkLink: _technicalWorkLinkController.text,
-        department: _selectedDepartment,
+        department: _selectedDepartment!,
         dob: _selectedDob!,
         linkedinProfileLink: _linkedinProfileLinkController.text,
-        githubProfileLink: _githubProfileLinkController.text,
         std10thBoard: _std10thBoardController.text,
         std10thPercentage: _std10thPercentageController.text,
         std12thBoard: _std12thBoardController.text,
@@ -224,107 +327,53 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
         activeBackLogs: _activeBackLogsController.text,
       );
 
-      context.read<MasterDataCubit>().submitMasterData(masterData);
-    }
-  }
+      // Submit both master data and request
+      await context
+          .read<MasterDataCubit>()
+          .submitMasterData(masterData, userData['id']);
 
-  void _handleBatchSelection(
-      String? newValue,
-      Map<String, String> batchIdToDisplayMap,
-      List<ConfigurationModel> configurations) {
-    if (newValue != null) {
-      setState(() {
-        _selectedBatchId = batchIdToDisplayMap[newValue];
-        _selectedBatch = configurations
-            .firstWhere((config) => config.id == _selectedBatchId);
-
-        // Reset all fields to their default state
-        _mastersFieldsEnabled = true;
-        _graduationFieldsEnabled = true;
-
-        // Handle UG/PG logic
-        if (_selectedBatch!.status == GraduationStatus.ug) {
-          // For UG, set graduation fields and disable masters fields
-          _graduationDegreeController.text = _selectedBatch!.course;
-          _graduationSpecializationController.text =
-              _selectedBatch!.specialization;
-          _mastersDegreeController.text = 'N/A';
-          _mastersSpecializationController.text = 'N/A';
-          _mastersYearOfPassingController.text = 'N/A';
-          _mastersPercentageController.text = 'N/A';
-          // Disable masters fields and graduation fields
-          _mastersFieldsEnabled = false;
-          _graduationFieldsEnabled = false;
-        } else if (_selectedBatch!.status == GraduationStatus.pg) {
-          // For PG, set masters fields and leave graduation fields editable
-          _mastersDegreeController.text = _selectedBatch!.course;
-          _mastersSpecializationController.text =
-              _selectedBatch!.specialization;
-          // Disable masters fields and enable graduation fields
-          _mastersFieldsEnabled = false;
-          _graduationFieldsEnabled = true;
-        }
-      });
+      final request = RequestModel(
+        type: RequestType.masterData,
+        status: RequestStatus.pending,
+      );
+      context.read<RequestCubit>().createRequest(request, userData['id']);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Master Data Form'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        elevation: 0,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        foregroundColor: Theme.of(context).textTheme.bodyLarge?.color,
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _submitForm,
-        icon: const Icon(Icons.check),
-        label: const Text('Submit'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: BlocConsumer<MasterDataCubit, MasterDataState>(
-        listener: (context, state) {
-          if (state is MasterDataError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Theme.of(context).colorScheme.error,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            );
-          } else if (state is MasterDataSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Master data submitted successfully'),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            );
-            Navigator.pop(context);
-          }
-        },
-        builder: (context, state) {
-          if (state is MasterDataLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+    return BlocConsumer<MasterDataCubit, MasterDataState>(
+      listener: (context, state) {
+        if (state is MasterDataError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
+        } else if (state is MasterDataLoaded) {
+          _prefillForm(state.masterData);
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Master Data Form'),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context),
+            ),
+            elevation: 0,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            foregroundColor: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: _submitForm,
+            icon: const Icon(Icons.check),
+            label: const Text('Submit'),
+            backgroundColor: Theme.of(context).primaryColor,
+            foregroundColor: Colors.white,
+            elevation: 0,
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
             child: Form(
               key: _formKey,
               child: Column(
@@ -335,107 +384,15 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
                     title: 'Personal Information',
                     icon: Icons.person,
                     children: [
-                      _buildFormField(
-                        controller: _firstNameController,
-                        label: 'First Name',
+                      _buildPersonalInfoFields(),
+                      const SizedBox(height: 16),
+                      _buildGenderField(),
+                      const SizedBox(height: 16),
+                      _buildDateField(
+                        controller: _dateOfBirthController,
+                        label: 'Date of Birth',
                         validator: (value) =>
                             value?.isEmpty ?? true ? 'Required' : null,
-                      ),
-                      _buildFormField(
-                        controller: _middleNameController,
-                        label: 'Middle Name',
-                      ),
-                      _buildFormField(
-                        controller: _lastNameController,
-                        label: 'Last Name',
-                        validator: (value) =>
-                            value?.isEmpty ?? true ? 'Required' : null,
-                      ),
-                      _buildFormField(
-                        controller: _enrollmentNumberController,
-                        label: 'Enrollment Number',
-                        validator: (value) =>
-                            value?.isEmpty ?? true ? 'Required' : null,
-                      ),
-                      BlocBuilder<ConfigurationCubit, ConfigurationState>(
-                        builder: (context, state) {
-                          if (state is ConfigurationLoading) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          } else if (state is ConfigurationsLoaded) {
-                            if (state.configurations.isEmpty) {
-                              return const Text('No batches available');
-                            }
-
-                            List<String> batchOptions = [];
-                            Map<String, String> batchIdToDisplayMap = {};
-
-                            for (var config in state.configurations) {
-                              String displayText =
-                                  "${config.department.name.toUpperCase()} - ${config.course} - ${config.specialization}";
-                              batchOptions.add(displayText);
-                              batchIdToDisplayMap[displayText] = config.id;
-                            }
-
-                            return _buildDropDown(
-                              label: 'Batch',
-                              dropDownItemsList: batchOptions,
-                              onChanged: (String? newValue) {
-                                _handleBatchSelection(newValue,
-                                    batchIdToDisplayMap, state.configurations);
-                              },
-                              initialValue: _selectedBatchId != null
-                                  ? batchOptions.firstWhere(
-                                      (option) =>
-                                          batchIdToDisplayMap[option] ==
-                                          _selectedBatchId,
-                                      orElse: () => batchOptions.first)
-                                  : null,
-                              isRequired: true,
-                            );
-                          }
-                          return const Text('Failed to load batches');
-                        },
-                      ),
-                      _buildDropDown(
-                        label: 'Gender',
-                        dropDownItemsList: ['Male', 'Female', 'Other'],
-                        onChanged: (String? newValue) {
-                          if (newValue != null) {
-                            setState(() {
-                              _selectedGender = newValue;
-                            });
-                          }
-                        },
-                        initialValue: _selectedGender,
-                      ),
-                      GestureDetector(
-                        onTap: () async {
-                          final DateTime? picked = await showDatePicker(
-                            context: context,
-                            initialDate: _selectedDob ?? DateTime.now(),
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime.now(),
-                          );
-                          if (picked != null) {
-                            setState(() {
-                              _selectedDob = picked;
-                              _dateOfBirthController.text =
-                                  '${picked.day}/${picked.month}/${picked.year}';
-                            });
-                          }
-                        },
-                        child: _buildFormField(
-                          controller: _dateOfBirthController,
-                          label: 'Date of Birth',
-                          validator: (value) =>
-                              value?.isEmpty ?? true ? 'Required' : null,
-                          enabled: false,
-                          suffixIcon: Icon(
-                            Icons.calendar_today,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ),
                       ),
                       _buildFormField(
                         controller: _phoneNumberController,
@@ -524,6 +481,96 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
                     title: 'Higher Education Information',
                     icon: Icons.workspace_premium,
                     children: [
+                      BlocBuilder<ConfigurationCubit, ConfigurationState>(
+                        builder: (context, state) {
+                          if (state is ConfigurationLoading) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (state is ConfigurationsLoaded) {
+                            if (state.configurations.isEmpty) {
+                              return const Text('No batches available');
+                            }
+
+                            List<String> batchOptions = [];
+                            Map<String, String> batchIdToDisplayMap = {};
+
+                            for (var config in state.configurations) {
+                              String displayText =
+                                  "${config.department.name.toUpperCase()} - ${config.course} - ${config.specialization}";
+                              batchOptions.add(displayText);
+                              batchIdToDisplayMap[displayText] = config.id;
+                            }
+
+                            return _buildDropDownField(
+                              controller: TextEditingController(),
+                              label: 'Select your Batch',
+                              items: batchOptions,
+                              validator: (value) =>
+                                  value?.isEmpty ?? true ? 'Required' : null,
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  final selectedConfig =
+                                      state.configurations.firstWhere(
+                                    (config) =>
+                                        batchIdToDisplayMap[newValue] ==
+                                        config.id,
+                                  );
+                                  setState(() {
+                                    _selectedBatchId = selectedConfig.id;
+                                    _selectedDepartment =
+                                        selectedConfig.department.name;
+
+                                    // Check if the batch is UG or PG based on status
+                                    if (selectedConfig.status ==
+                                        GraduationStatus.ug) {
+                                      // UG Batch
+                                      _graduationDegreeController.text =
+                                          selectedConfig.course;
+                                      _graduationSpecializationController.text =
+                                          selectedConfig.specialization;
+                                      _graduationFieldsEnabled = false;
+
+                                      // Set masters fields to N/A and disable them
+                                      _mastersDegreeController.text = 'N/A';
+                                      _mastersSpecializationController.text =
+                                          'N/A';
+                                      _mastersYearOfPassingController.text =
+                                          'N/A';
+                                      _mastersPercentageController.text = 'N/A';
+                                      _mastersFieldsEnabled = false;
+                                      _selectedBatchStatus =
+                                          GraduationStatus.ug;
+                                    } else if (selectedConfig.status ==
+                                        GraduationStatus.pg) {
+                                      // PG Batch
+                                      _mastersDegreeController.text =
+                                          selectedConfig.course;
+                                      _mastersSpecializationController.text =
+                                          selectedConfig.specialization;
+                                      _mastersYearOfPassingController.text =
+                                          ''; // Empty the year of passing
+                                      _mastersPercentageController.text =
+                                          ''; // Empty the percentage
+
+                                      // Enable only year of passing and percentage fields
+                                      _mastersFieldsEnabled = true;
+                                      _selectedBatchStatus =
+                                          GraduationStatus.pg;
+
+                                      // Empty and enable graduation fields
+                                      _graduationDegreeController.text = '';
+                                      _graduationSpecializationController.text =
+                                          '';
+                                      _graduationFieldsEnabled = true;
+                                    }
+                                  });
+                                }
+                              },
+                            );
+                          }
+                          return const Text('Failed to load batches');
+                        },
+                      ),
                       _buildFormField(
                         controller: _graduationDegreeController,
                         label: 'Graduation Degree',
@@ -553,14 +600,23 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
                             value?.isEmpty ?? true ? 'Required' : null,
                       ),
                       _buildFormField(
+                        controller: _activeBackLogsController,
+                        label: 'Active Backlogs',
+                        textInputType: TextInputType.number,
+                        validator: (value) =>
+                            value?.isEmpty ?? true ? 'Required' : null,
+                      ),
+                      _buildFormField(
                         controller: _mastersDegreeController,
                         label: 'Masters Degree',
-                        enabled: _mastersFieldsEnabled,
+                        enabled: _mastersFieldsEnabled &&
+                            _selectedBatchStatus != GraduationStatus.pg,
                       ),
                       _buildFormField(
                         controller: _mastersSpecializationController,
                         label: 'Masters Specialization',
-                        enabled: _mastersFieldsEnabled,
+                        enabled: _mastersFieldsEnabled &&
+                            _selectedBatchStatus != GraduationStatus.pg,
                       ),
                       _buildFormField(
                         controller: _mastersYearOfPassingController,
@@ -574,11 +630,6 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
                         textInputType: TextInputType.number,
                         enabled: _mastersFieldsEnabled,
                       ),
-                      _buildFormField(
-                        controller: _activeBackLogsController,
-                        label: 'Active Backlogs',
-                        textInputType: TextInputType.number,
-                      ),
                     ],
                   ),
 
@@ -587,29 +638,18 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
                     title: 'Professional Information',
                     icon: Icons.work,
                     children: [
-                      _buildDropDown(
-                        label: 'Prior Experience',
-                        dropDownItemsList: ['Yes', 'No'],
-                        onChanged: (String? newValue) {
-                          if (newValue != null) {
-                            setState(() {
-                              _priorExperience = newValue;
-                            });
-                          }
+                      _buildPriorExperienceField(),
+                      FileUploadField(
+                        label: 'Resume',
+                        fileCount: 1,
+                        allowedExtensions: [
+                          'pdf',
+                        ],
+                        onFilesSelected: (files) {
+                          setState(() {
+                            _selectedResumeFiles = files;
+                          });
                         },
-                        initialValue: _priorExperience,
-                      ),
-                      if (_priorExperience == 'Yes')
-                        _buildFormField(
-                          controller: _experienceInMonthsController,
-                          label: 'Experience in Months',
-                          textInputType: TextInputType.number,
-                          validator: (value) =>
-                              value?.isEmpty ?? true ? 'Required' : null,
-                        ),
-                      _buildFormField(
-                        controller: _resumeLinkController,
-                        label: 'Resume Link',
                       ),
                       _buildFormField(
                         controller: _technicalWorkLinkController,
@@ -618,10 +658,6 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
                       _buildFormField(
                         controller: _linkedinProfileLinkController,
                         label: 'LinkedIn Profile Link',
-                      ),
-                      _buildFormField(
-                        controller: _githubProfileLinkController,
-                        label: 'GitHub Profile Link',
                       ),
                     ],
                   ),
@@ -692,9 +728,9 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
                 ],
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -722,7 +758,7 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.05),
+              color: Theme.of(context).primaryColor.withOpacity(0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -774,145 +810,258 @@ class _MasterDataFormPageState extends State<MasterDataFormPage> {
     Widget? suffixIcon,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context)
-                      .textTheme
-                      .bodyLarge
-                      ?.color
-                      ?.withOpacity(0.8),
-                ),
-          ),
-          const SizedBox(height: 8),
-          TextFormField(
-            controller: controller,
-            keyboardType: textInputType,
-            validator: validator,
-            enabled: enabled,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
-              ),
-              filled: true,
-              fillColor: enabled
-                  ? Theme.of(context).scaffoldBackgroundColor
-                  : Theme.of(context).disabledColor.withOpacity(0.1),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Theme.of(context).dividerColor,
-                  width: 1,
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Theme.of(context).dividerColor,
-                  width: 1,
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Theme.of(context).primaryColor,
-                  width: 2,
-                ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.error,
-                  width: 1,
-                ),
-              ),
-              suffixIcon: suffixIcon,
-            ),
-          ),
-        ],
+      padding: const EdgeInsets.only(bottom: 16),
+      child: CustomFormField(
+        controller: controller,
+        label: label,
+        textInputType: textInputType,
+        validator: validator,
+        enabled: enabled,
+        suffixIcon: suffixIcon,
       ),
     );
   }
 
-  Widget _buildDropDown({
+  Widget _buildDropDownField({
+    required TextEditingController controller,
     required String label,
-    required List<String> dropDownItemsList,
-    required void Function(String?) onChanged,
-    String? initialValue,
-    bool isRequired = false,
+    required List<String> items,
+    String? Function(String?)? validator,
+    void Function(String?)? onChanged,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context)
-                      .textTheme
-                      .bodyLarge
-                      ?.color
-                      ?.withOpacity(0.8),
-                ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Theme.of(context).dividerColor,
-                width: 1,
-              ),
-            ),
-            child: DropdownButtonFormField<String>(
-              value: initialValue,
-              items: dropDownItemsList.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                  ),
-                );
-              }).toList(),
-              onChanged: onChanged,
-              decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                border: InputBorder.none,
-                hintText: 'Select $label',
-                hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).hintColor,
-                    ),
-              ),
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-              dropdownColor: Theme.of(context).scaffoldBackgroundColor,
-              icon: Icon(
-                Icons.arrow_drop_down,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
-        ],
+      padding: const EdgeInsets.only(bottom: 16),
+      child: CustomDropDown(
+        label: label,
+        dropDownItemsList: items,
+        onChanged: onChanged ?? (value) => controller.text = value ?? '',
+        initialValue: controller.text.isEmpty ? null : controller.text,
+        isRequired: validator != null,
       ),
     );
+  }
+
+  Widget _buildDateField({
+    required TextEditingController controller,
+    required String label,
+    String? Function(String?)? validator,
+    bool enabled = true,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: CustomFormField(
+        controller: controller,
+        label: label,
+        enabled: enabled,
+        validator: validator,
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.calendar_today),
+          onPressed: enabled
+              ? () async {
+                  final DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedDob ?? DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime.now(),
+                  );
+                  if (picked != null) {
+                    setState(() {
+                      _selectedDob = picked;
+                      controller.text =
+                          '${picked.day}/${picked.month}/${picked.year}';
+                    });
+                  }
+                }
+              : null,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPriorExperienceField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Prior Experience',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Radio<bool>(
+              value: true,
+              groupValue: _priorExperience,
+              onChanged: (value) {
+                setState(() {
+                  _priorExperience = value!;
+                });
+              },
+            ),
+            const Text('Yes'),
+            const SizedBox(width: 16),
+            Radio<bool>(
+              value: false,
+              groupValue: _priorExperience,
+              onChanged: (value) {
+                setState(() {
+                  _priorExperience = value!;
+                });
+              },
+            ),
+            const Text('No'),
+          ],
+        ),
+        if (_priorExperience) ...[
+          const SizedBox(height: 16),
+          CustomFormField(
+            controller: _experienceInMonthsController,
+            label: 'Experience in Months',
+            textInputType: TextInputType.number,
+            validator: (value) {
+              if (_priorExperience && (value == null || value.isEmpty)) {
+                return 'Please enter your experience in months';
+              }
+              return null;
+            },
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildGenderField() {
+    return CustomDropDown(
+      label: 'Gender',
+      dropDownItemsList: _genderOptions,
+      onChanged: (value) {
+        setState(() {
+          _selectedGender = value;
+        });
+      },
+      initialValue: _selectedGender,
+      isRequired: true,
+    );
+  }
+
+  Widget _buildPersonalInfoFields() {
+    return Column(
+      children: [
+        CustomFormField(
+          controller: _firstNameController,
+          label: 'First Name',
+          isRequired: true,
+        ),
+        const SizedBox(height: 16),
+        CustomFormField(
+          controller: _middleNameController,
+          label: 'Middle Name',
+        ),
+        const SizedBox(height: 16),
+        CustomFormField(
+          controller: _lastNameController,
+          label: 'Last Name',
+          isRequired: true,
+        ),
+        const SizedBox(height: 16),
+        CustomFormField(
+          controller: _enrollmentNumberController,
+          label: 'Enrollment Number',
+          isRequired: true,
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Required';
+            }
+            // Add validation for enrollment number format if needed
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  void _prefillForm(MasterDataModel masterData) {
+    // Personal Information
+    _firstNameController.text = masterData.firstName;
+    _middleNameController.text = masterData.middleName;
+    _lastNameController.text = masterData.lastName;
+    _enrollmentNumberController.text = masterData.enrollmentNumber;
+    _phoneNumberController.text = masterData.phoneNumber;
+    _emailAddressController.text = masterData.emailAddress;
+    _alternatePhoneNumberController.text = masterData.alternatePhoneNumber;
+    _amityEmailController.text = masterData.amityEmail;
+    _selectedGender = masterData.gender;
+    _selectedDob = masterData.dob;
+    _dateOfBirthController.text =
+        '${masterData.dob.day}/${masterData.dob.month}/${masterData.dob.year}';
+
+    // Academic Information
+    _std10thBoardController.text = masterData.std10thBoard;
+    _std10thPercentageController.text = masterData.std10thPercentage;
+    _std10thPassingYearController.text = masterData.std10thPassingYear;
+    _std12thBoardController.text = masterData.std12thBoard;
+    _std12thPercentageController.text = masterData.std12thPercentage;
+    _std12thPassingYearController.text = masterData.std12thPassingYear;
+    _activeBackLogsController.text = masterData.activeBackLogs;
+
+    // Higher Education Information
+    _selectedBatchId = masterData.batchId;
+    _selectedDepartment = masterData.department;
+    _graduationDegreeController.text = masterData.graduationDegree;
+    _graduationSpecializationController.text =
+        masterData.graduationSpecialization;
+    _graduationYearOfPassingController.text =
+        masterData.graduationYearOfPassing;
+    _graduationPercentageController.text = masterData.graduationPercentage;
+    _mastersDegreeController.text = masterData.mastersDegree;
+    _mastersSpecializationController.text = masterData.mastersSpecialization;
+    _mastersYearOfPassingController.text = masterData.mastersYearOfPassing;
+    _mastersPercentageController.text = masterData.mastersPercentage;
+
+    // Professional Information
+    _priorExperience = masterData.priorExperience;
+    _experienceInMonthsController.text = masterData.experienceInMonths;
+    _resumeLinkController.text = masterData.resumeLink;
+    _technicalWorkLinkController.text = masterData.technicalWorkLink;
+    _linkedinProfileLinkController.text = masterData.linkedinProfileLink;
+
+    // Location Information
+    _collegeLocationController.text = masterData.collegeLocation;
+    _preferredLocationController.text = masterData.preferredLocation;
+    _currentLocationController.text = masterData.currentLocation;
+    _permanentLocationController.text = masterData.permanentLocation;
+
+    // Parent Information
+    _fathersNameController.text = masterData.fathersName;
+    _mothersNameController.text = masterData.mothersName;
+    _fathersPhoneNumberController.text = masterData.fathersPhoneNumber;
+    _mothersPhoneNumberController.text = masterData.mothersPhoneNumber;
+    _fathersEmailController.text = masterData.fathersEmail;
+    _mothersEmailController.text = masterData.mothersEmail;
+
+    // Update UI state
+    setState(() {
+      // Enable/disable fields based on batch status
+      final configState = context.read<ConfigurationCubit>().state;
+      if (configState is ConfigurationsLoaded) {
+        final selectedConfig = configState.configurations.firstWhere(
+          (config) => config.id == masterData.batchId,
+          orElse: () => throw Exception('Configuration not found'),
+        );
+
+        if (selectedConfig.status == GraduationStatus.ug) {
+          _graduationFieldsEnabled = false;
+          _mastersFieldsEnabled = false;
+          _selectedBatchStatus = GraduationStatus.ug;
+        } else if (selectedConfig.status == GraduationStatus.pg) {
+          _graduationFieldsEnabled = true;
+          _mastersFieldsEnabled = true;
+          _selectedBatchStatus = GraduationStatus.pg;
+        }
+      }
+    });
   }
 }

@@ -1,24 +1,20 @@
 part of 'models.dart';
 
 class RequestModel {
-  final String id;
-  final String userId;
+  final String? id;
   final RequestType type;
-  final Map<String, dynamic> data;
-  final String status;
-  final DateTime createdAt;
+  final RequestStatus status;
+  final DateTime? createdAt;
   final DateTime? updatedAt;
-  final String? approvedBy;
-  final String? rejectedBy;
+  String? approvedBy;
+  String? rejectedBy;
   final String? rejectionReason;
 
   RequestModel({
-    required this.id,
-    required this.userId,
+    this.id,
     required this.type,
-    required this.data,
     required this.status,
-    required this.createdAt,
+    this.createdAt,
     this.updatedAt,
     this.approvedBy,
     this.rejectedBy,
@@ -27,16 +23,18 @@ class RequestModel {
 
   factory RequestModel.fromJson(Map<String, dynamic> json) {
     return RequestModel(
-      id: json['id'] as String,
-      userId: json['userId'] as String,
+      id: json['\$id'] as String?,
       type: RequestType.values.firstWhere(
         (e) => e.toString() == 'RequestType.${json['type']}',
       ),
-      data: json['data'] as Map<String, dynamic>,
-      status: json['status'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
+      status: RequestStatus.values.firstWhere(
+        (e) => e.toString() == 'RequestStatus.${json['status']}',
+      ),
+      createdAt: json['\$createdAt'] != null
+          ? DateTime.parse(json['\$createdAt'] as String)
+          : null,
+      updatedAt: json['\$updatedAt'] != null
+          ? DateTime.parse(json['\$updatedAt'] as String)
           : null,
       approvedBy: json['approvedBy'] as String?,
       rejectedBy: json['rejectedBy'] as String?,
@@ -46,25 +44,18 @@ class RequestModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'userId': userId,
       'type': type.toString().split('.').last,
-      'data': data,
-      'status': status,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
-      'approvedBy': approvedBy,
-      'rejectedBy': rejectedBy,
-      'rejectionReason': rejectionReason,
+      'status': status.toString().split('.').last,
+      'approvedBy': approvedBy ?? "",
+      'rejectedBy': rejectedBy ?? "",
+      'rejectionReason': rejectionReason ?? "",
     };
   }
 
   RequestModel copyWith({
     String? id,
-    String? userId,
     RequestType? type,
-    Map<String, dynamic>? data,
-    String? status,
+    RequestStatus? status,
     DateTime? createdAt,
     DateTime? updatedAt,
     String? approvedBy,
@@ -73,9 +64,7 @@ class RequestModel {
   }) {
     return RequestModel(
       id: id ?? this.id,
-      userId: userId ?? this.userId,
       type: type ?? this.type,
-      data: data ?? this.data,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

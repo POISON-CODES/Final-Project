@@ -16,15 +16,14 @@ class ConfigurationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        elevation: 3,
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -120,13 +119,12 @@ class ConfigurationCard extends StatelessWidget {
                       visualDensity: VisualDensity.compact,
                       tooltip: 'Edit Configuration',
                     ),
-                  if (onDelete != null)
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: onDelete,
-                      visualDensity: VisualDensity.compact,
-                      tooltip: 'Delete Configuration',
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: onDelete,
+                    visualDensity: VisualDensity.compact,
+                    tooltip: 'Delete Configuration',
+                  ),
                 ],
               ),
             ],

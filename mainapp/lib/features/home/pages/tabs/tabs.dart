@@ -1,11 +1,20 @@
+import 'package:excel/excel.dart' as excel_package;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:io';
+import 'package:mainapp/constants/constants.dart';
 import 'package:mainapp/custom/widgets/company_card.dart';
 import 'package:mainapp/features/auth/cubit/auth_cubit.dart';
 import 'package:mainapp/features/companies/cubit/company_cubit.dart';
-import 'package:mainapp/features/forms/pages/default_form_page.dart';
+import 'package:mainapp/features/configurations/cubit/configuration_cubit.dart';
+import 'package:mainapp/features/master_data/cubit/master_data_cubit.dart';
 import 'package:mainapp/features/master_data/pages/master_data_form_page.dart';
+import 'package:mainapp/features/requests/cubit/request_cubit.dart';
+import 'package:mainapp/features/requests/pages/request_detail_page.dart';
+import 'package:mainapp/models/models.dart';
 
 part 'settings_page_tab.dart';
 part 'home_page_tab.dart';
 part 'search_page_tab.dart';
+part 'requests_page_tab.dart';
+part 'stats_page_tab.dart';

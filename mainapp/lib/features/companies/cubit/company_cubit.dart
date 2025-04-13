@@ -128,4 +128,15 @@ class CompanyCubit extends Cubit<CompanyState> {
       throw e.toString();
     }
   }
+
+  void getActiveCompanies() async {
+    try {
+      emit(CompanyLoading());
+      final List<CompanyModel> companies =
+          await companyRepository.getActiveCompanies();
+      emit(CompaniesLoaded(companies: companies));
+    } catch (e) {
+      emit(CompanyError(e.toString()));
+    }
+  }
 }

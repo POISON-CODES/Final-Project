@@ -1,5 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-
 part of 'models.dart';
 
 class MasterDataModel {
@@ -22,14 +20,13 @@ class MasterDataModel {
   final String mastersSpecialization;
   final String mastersYearOfPassing;
   final String mastersPercentage;
-  final String priorExperience;
+  final bool priorExperience;
   final String experienceInMonths;
   final String resumeLink;
   final String technicalWorkLink;
   final String department;
   final DateTime dob;
   final String linkedinProfileLink;
-  final String githubProfileLink;
   final String std10thBoard;
   final String std10thPercentage;
   final String std12thBoard;
@@ -47,7 +44,11 @@ class MasterDataModel {
   final String fathersEmail;
   final String mothersEmail;
   final String activeBackLogs;
-  MasterDataModel({
+  final bool approved;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const MasterDataModel({
     required this.id,
     required this.firstName,
     required this.middleName,
@@ -74,7 +75,6 @@ class MasterDataModel {
     required this.department,
     required this.dob,
     required this.linkedinProfileLink,
-    required this.githubProfileLink,
     required this.std10thBoard,
     required this.std10thPercentage,
     required this.std12thBoard,
@@ -92,6 +92,9 @@ class MasterDataModel {
     required this.fathersEmail,
     required this.mothersEmail,
     required this.activeBackLogs,
+    this.approved = false,
+    this.createdAt,
+    this.updatedAt,
   });
 
   MasterDataModel copyWith({
@@ -114,14 +117,13 @@ class MasterDataModel {
     String? mastersSpecialization,
     String? mastersYearOfPassing,
     String? mastersPercentage,
-    String? priorExperience,
+    bool? priorExperience,
     String? experienceInMonths,
     String? resumeLink,
     String? technicalWorkLink,
     String? department,
     DateTime? dob,
     String? linkedinProfileLink,
-    String? githubProfileLink,
     String? std10thBoard,
     String? std10thPercentage,
     String? std12thBoard,
@@ -139,6 +141,9 @@ class MasterDataModel {
     String? fathersEmail,
     String? mothersEmail,
     String? activeBackLogs,
+    bool? approved,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return MasterDataModel(
       id: id ?? this.id,
@@ -170,7 +175,6 @@ class MasterDataModel {
       department: department ?? this.department,
       dob: dob ?? this.dob,
       linkedinProfileLink: linkedinProfileLink ?? this.linkedinProfileLink,
-      githubProfileLink: githubProfileLink ?? this.githubProfileLink,
       std10thBoard: std10thBoard ?? this.std10thBoard,
       std10thPercentage: std10thPercentage ?? this.std10thPercentage,
       std12thBoard: std12thBoard ?? this.std12thBoard,
@@ -188,12 +192,14 @@ class MasterDataModel {
       fathersEmail: fathersEmail ?? this.fathersEmail,
       mothersEmail: mothersEmail ?? this.mothersEmail,
       activeBackLogs: activeBackLogs ?? this.activeBackLogs,
+      approved: approved ?? this.approved,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'id': id,
       'firstName': firstName,
       'middleName': middleName,
       'lastName': lastName,
@@ -217,9 +223,8 @@ class MasterDataModel {
       'resumeLink': resumeLink,
       'technicalWorkLink': technicalWorkLink,
       'department': department,
-      'dob': dob.millisecondsSinceEpoch,
+      'dob': dob.toIso8601String(),
       'linkedinProfileLink': linkedinProfileLink,
-      'githubProfileLink': githubProfileLink,
       'std10thBoard': std10thBoard,
       'std10thPercentage': std10thPercentage,
       'std12thBoard': std12thBoard,
@@ -237,6 +242,7 @@ class MasterDataModel {
       'fathersEmail': fathersEmail,
       'mothersEmail': mothersEmail,
       'activeBackLogs': activeBackLogs,
+      'approved': approved,
     };
   }
 
@@ -261,14 +267,13 @@ class MasterDataModel {
       mastersSpecialization: map['mastersSpecialization'] as String,
       mastersYearOfPassing: map['mastersYearOfPassing'] as String,
       mastersPercentage: map['mastersPercentage'] as String,
-      priorExperience: map['priorExperience'] as String,
+      priorExperience: map['priorExperience'] as bool,
       experienceInMonths: map['experienceInMonths'] as String,
       resumeLink: map['resumeLink'] as String,
       technicalWorkLink: map['technicalWorkLink'] as String,
       department: map['department'] as String,
       dob: DateTime.fromMillisecondsSinceEpoch(map['dob'] as int),
       linkedinProfileLink: map['linkedinProfileLink'] as String,
-      githubProfileLink: map['githubProfileLink'] as String,
       std10thBoard: map['std10thBoard'] as String,
       std10thPercentage: map['std10thPercentage'] as String,
       std12thBoard: map['std12thBoard'] as String,
@@ -286,6 +291,13 @@ class MasterDataModel {
       fathersEmail: map['fathersEmail'] as String,
       mothersEmail: map['mothersEmail'] as String,
       activeBackLogs: map['activeBackLogs'] as String,
+      approved: map['approved'] as bool? ?? false,
+      createdAt: map['\$createdAt'] != null
+          ? DateTime.parse(map['\$createdAt'])
+          : null,
+      updatedAt: map['\$updatedAt'] != null
+          ? DateTime.parse(map['\$updatedAt'])
+          : null,
     );
   }
 
@@ -296,7 +308,7 @@ class MasterDataModel {
 
   @override
   String toString() {
-    return 'MasterDataModel(id: $id, firstName: $firstName, middleName: $middleName, lastName: $lastName, enrollmentNumber: $enrollmentNumber, batchId: $batchId, gender: $gender, phoneNumber: $phoneNumber, emailAddress: $emailAddress, collegeLocation: $collegeLocation, preferredLocation: $preferredLocation, graduationDegree: $graduationDegree, graduationSpecialization: $graduationSpecialization, graduationYearOfPassing: $graduationYearOfPassing, graduationPercentage: $graduationPercentage, mastersDegree: $mastersDegree, mastersSpecialization: $mastersSpecialization, mastersYearOfPassing: $mastersYearOfPassing, mastersPercentage: $mastersPercentage, priorExperience: $priorExperience, experienceInMonths: $experienceInMonths, resumeLink: $resumeLink, technicalWorkLink: $technicalWorkLink, department: $department, dob: $dob, linkedinProfileLink: $linkedinProfileLink, githubProfileLink: $githubProfileLink, std10thBoard: $std10thBoard, std10thPercentage: $std10thPercentage, std12thBoard: $std12thBoard, std12thPercentage: $std12thPercentage, currentLocation: $currentLocation, permanentLocation: $permanentLocation, std10thPassingYear: $std10thPassingYear, std12thPassingYear: $std12thPassingYear, alternatePhoneNumber: $alternatePhoneNumber, amityEmail: $amityEmail, fathersName: $fathersName, mothersName: $mothersName, fathersPhoneNumber: $fathersPhoneNumber, mothersPhoneNumber: $mothersPhoneNumber, fathersEmail: $fathersEmail, mothersEmail: $mothersEmail, activeBackLogs: $activeBackLogs)';
+    return 'MasterDataModel(id: $id, firstName: $firstName, middleName: $middleName, lastName: $lastName, enrollmentNumber: $enrollmentNumber, batchId: $batchId, gender: $gender, phoneNumber: $phoneNumber, emailAddress: $emailAddress, collegeLocation: $collegeLocation, preferredLocation: $preferredLocation, graduationDegree: $graduationDegree, graduationSpecialization: $graduationSpecialization, graduationYearOfPassing: $graduationYearOfPassing, graduationPercentage: $graduationPercentage, mastersDegree: $mastersDegree, mastersSpecialization: $mastersSpecialization, mastersYearOfPassing: $mastersYearOfPassing, mastersPercentage: $mastersPercentage, priorExperience: $priorExperience, experienceInMonths: $experienceInMonths, resumeLink: $resumeLink, technicalWorkLink: $technicalWorkLink, department: $department, dob: $dob, linkedinProfileLink: $linkedinProfileLink, std10thBoard: $std10thBoard, std10thPercentage: $std10thPercentage, std12thBoard: $std12thBoard, std12thPercentage: $std12thPercentage, currentLocation: $currentLocation, permanentLocation: $permanentLocation, std10thPassingYear: $std10thPassingYear, std12thPassingYear: $std12thPassingYear, alternatePhoneNumber: $alternatePhoneNumber, amityEmail: $amityEmail, fathersName: $fathersName, mothersName: $mothersName, fathersPhoneNumber: $fathersPhoneNumber, mothersPhoneNumber: $mothersPhoneNumber, fathersEmail: $fathersEmail, mothersEmail: $mothersEmail, activeBackLogs: $activeBackLogs, approved: $approved, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -329,7 +341,6 @@ class MasterDataModel {
         other.department == department &&
         other.dob == dob &&
         other.linkedinProfileLink == linkedinProfileLink &&
-        other.githubProfileLink == githubProfileLink &&
         other.std10thBoard == std10thBoard &&
         other.std10thPercentage == std10thPercentage &&
         other.std12thBoard == std12thBoard &&
@@ -346,7 +357,10 @@ class MasterDataModel {
         other.mothersPhoneNumber == mothersPhoneNumber &&
         other.fathersEmail == fathersEmail &&
         other.mothersEmail == mothersEmail &&
-        other.activeBackLogs == activeBackLogs;
+        other.activeBackLogs == activeBackLogs &&
+        other.approved == approved &&
+        other.createdAt == createdAt &&
+        other.updatedAt == updatedAt;
   }
 
   @override
@@ -377,7 +391,6 @@ class MasterDataModel {
         department.hashCode ^
         dob.hashCode ^
         linkedinProfileLink.hashCode ^
-        githubProfileLink.hashCode ^
         std10thBoard.hashCode ^
         std10thPercentage.hashCode ^
         std12thBoard.hashCode ^
@@ -394,6 +407,9 @@ class MasterDataModel {
         mothersPhoneNumber.hashCode ^
         fathersEmail.hashCode ^
         mothersEmail.hashCode ^
-        activeBackLogs.hashCode;
+        activeBackLogs.hashCode ^
+        approved.hashCode ^
+        createdAt.hashCode ^
+        updatedAt.hashCode;
   }
 }

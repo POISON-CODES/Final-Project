@@ -6,6 +6,8 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
+class AuthAccountCreated extends AuthState {}
+
 class AuthAdminAuthenticated extends AuthState {
   final UserModel user;
   AuthAdminAuthenticated(this.user);

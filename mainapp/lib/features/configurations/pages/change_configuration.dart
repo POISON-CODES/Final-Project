@@ -93,12 +93,14 @@ class _ChangeConfigurationState extends State<ChangeConfiguration> {
                   return ConfigurationCard(
                     configuration: config,
                     onTap: () {
-                      Navigator.of(context).push(
+                      Navigator.push(
+                        context,
                         ConfigurationDetailPage.route(config),
                       );
                     },
                     onEdit: () {
-                      Navigator.of(context).push(
+                      Navigator.push(
+                        context,
                         CreateConfiguration.routeWithData(config),
                       );
                     },

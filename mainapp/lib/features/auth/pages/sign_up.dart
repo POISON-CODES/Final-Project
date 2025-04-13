@@ -67,83 +67,88 @@ class _SignUpPageState extends State<SignUpPage> {
               child: CircularProgressIndicator(),
             );
           }
-          return Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Sign Up",
-                    style: TextStyle(
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 80),
-                  CustomFormField(
-                    controller: nameController,
-                    obscureText: false,
-                    textInputType: TextInputType.text,
-                    label: 'Name',
-                    validator: nameValidator,
-                  ),
-                  SizedBox(height: 10),
-                  CustomFormField(
-                    controller: emailController,
-                    obscureText: false,
-                    textInputType: TextInputType.emailAddress,
-                    label: 'E-mail',
-                    validator: emailValidator,
-                  ),
-                  SizedBox(height: 10),
-                  CustomFormField(
-                    controller: phoneController,
-                    obscureText: false,
-                    textInputType: TextInputType.phone,
-                    label: 'Phone Number',
-                    validator: phoneValidator,
-                  ),
-                  SizedBox(height: 10),
-                  CustomFormField(
-                    controller: passwordController,
-                    obscureText: true,
-                    textInputType: TextInputType.text,
-                    label: 'Password',
-                    validator: passwordValidator,
-                  ),
-                  SizedBox(height: 80),
-                  ElevatedButton(
-                    onPressed: _createUser,
-                    child: Text(
-                      "SUBMIT",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+          return Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Sign Up",
+                        style: TextStyle(
+                          fontSize: 50,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).push(LoginPage.route()),
-                    child: RichText(
-                      text: TextSpan(
-                        text: "Already have an account? ",
-                        style: Theme.of(context).textTheme.titleMedium,
-                        children: [
-                          TextSpan(
-                            text: "Sign In",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        ],
+                      const SizedBox(height: 80),
+                      CustomFormField(
+                        controller: nameController,
+                        obscureText: false,
+                        textInputType: TextInputType.text,
+                        label: 'Name',
+                        validator: nameValidator,
                       ),
-                    ),
-                  )
-                ],
+                      SizedBox(height: 10),
+                      CustomFormField(
+                        controller: emailController,
+                        obscureText: false,
+                        textInputType: TextInputType.emailAddress,
+                        label: 'E-mail',
+                        validator: emailValidator,
+                      ),
+                      SizedBox(height: 10),
+                      CustomFormField(
+                        controller: phoneController,
+                        obscureText: false,
+                        textInputType: TextInputType.phone,
+                        label: 'Phone Number',
+                        validator: phoneValidator,
+                      ),
+                      SizedBox(height: 10),
+                      CustomFormField(
+                        controller: passwordController,
+                        obscureText: true,
+                        textInputType: TextInputType.text,
+                        label: 'Password',
+                        validator: passwordValidator,
+                      ),
+                      SizedBox(height: 80),
+                      ElevatedButton(
+                        onPressed: _createUser,
+                        child: Text(
+                          "SUBMIT",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () =>
+                            Navigator.of(context).push(LoginPage.route()),
+                        child: RichText(
+                          text: TextSpan(
+                            text: "Already have an account? ",
+                            style: Theme.of(context).textTheme.titleMedium,
+                            children: [
+                              TextSpan(
+                                text: "Sign In",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
             ),
           );

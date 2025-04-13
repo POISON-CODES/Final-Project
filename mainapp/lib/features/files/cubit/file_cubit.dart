@@ -2,6 +2,7 @@ import 'package:appwrite/models.dart' as models;
 import 'package:equatable/equatable.dart' show Equatable;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mainapp/features/files/repository/file_repository.dart';
+import 'dart:typed_data';
 
 part 'file_state.dart';
 
@@ -26,10 +27,12 @@ class FileCubit extends Cubit<FileState> {
     return _repository.getFileViewUrl(fileId, bucketId);
   }
 
-  Future<String> uploadFile(String filePath, String fileName) async {
+  Future<String> uploadFile(
+      Uint8List fileBytes, String fileName, String bucketId) async {
     try {
       emit(FileLoading());
-      final fileId = await _repository.uploadFile(filePath, fileName);
+      final fileId =
+          await _repository.uploadFile(fileBytes, fileName, bucketId);
       emit(FileUploaded(fileId));
       return fileId;
     } catch (e) {

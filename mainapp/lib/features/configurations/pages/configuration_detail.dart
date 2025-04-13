@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mainapp/constants/constants.dart' show GraduationStatus;
 import 'package:mainapp/custom/widgets/custom_global_widgets.dart';
 import 'package:mainapp/features/configurations/pages/create_configuration.dart';
+import 'package:mainapp/features/master_data/cubit/master_data_cubit.dart';
 import 'package:mainapp/models/models.dart';
 
-class ConfigurationDetailPage extends StatelessWidget {
+class ConfigurationDetailPage extends StatefulWidget {
   final ConfigurationModel configuration;
 
   const ConfigurationDetailPage({
@@ -19,6 +21,19 @@ class ConfigurationDetailPage extends StatelessWidget {
       );
 
   @override
+  State<ConfigurationDetailPage> createState() =>
+      _ConfigurationDetailPageState();
+}
+
+class _ConfigurationDetailPageState extends State<ConfigurationDetailPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Load all master data to show students in this batch
+    context.read<MasterDataCubit>().getAllMasterData();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
@@ -28,7 +43,7 @@ class ConfigurationDetailPage extends StatelessWidget {
             icon: const Icon(Icons.edit),
             onPressed: () {
               Navigator.of(context).push(
-                CreateConfiguration.routeWithData(configuration),
+                CreateConfiguration.routeWithData(widget.configuration),
               );
             },
             tooltip: "Edit Configuration",
@@ -64,7 +79,7 @@ class ConfigurationDetailPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  configuration.course,
+                  widget.configuration.course,
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -74,11 +89,11 @@ class ConfigurationDetailPage extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(configuration.status),
+                    color: _getStatusColor(widget.configuration.status),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    configuration.status.name.toUpperCase(),
+                    widget.configuration.status.name.toUpperCase(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -88,13 +103,14 @@ class ConfigurationDetailPage extends StatelessWidget {
               ],
             ),
             const Divider(height: 24),
+            _buildDetailItem("Department",
+                widget.configuration.department.name.toUpperCase()),
+            _buildDetailItem("Course Code", widget.configuration.courseCode),
             _buildDetailItem(
-                "Department", configuration.department.name.toUpperCase()),
-            _buildDetailItem("Course Code", configuration.courseCode),
-            _buildDetailItem("Specialization", configuration.specialization),
-            _buildDetailItem("Head of Institution", configuration.hoi),
+                "Specialization", widget.configuration.specialization),
+            _buildDetailItem("Head of Institution", widget.configuration.hoi),
             _buildDetailItem(
-                "Faculty Coordinator", configuration.facultyCoordinator),
+                "Faculty Coordinator", widget.configuration.facultyCoordinator),
           ],
         ),
       ),
@@ -151,66 +167,110 @@ class ConfigurationDetailPage extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    "${configuration.studentList.length} Students",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                BlocBuilder<MasterDataCubit, MasterDataState>(
+                  builder: (context, state) {
+                    if (state is MasterDataListLoaded) {
+                      final students = state.masterDataList
+                          .where(
+                              (data) => data.batchId == widget.configuration.id)
+                          .toList();
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          "${students.length} Students",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            if (configuration.studentList.isEmpty)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    "No students in this configuration yet",
-                    style: TextStyle(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey,
+            BlocBuilder<MasterDataCubit, MasterDataState>(
+              builder: (context, state) {
+                if (state is MasterDataLoading) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: CircularProgressIndicator(),
                     ),
-                  ),
-                ),
-              )
-            else
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: configuration.studentList.length,
-                itemBuilder: (context, index) {
-                  final student = configuration.studentList[index];
-                  return ListTile(
-                    leading: CircleAvatar(
-                      child: Text(
-                        student != null
-                            ? student.substring(0, 1).toUpperCase()
-                            : "?",
-                      ),
-                    ),
-                    title: Text(student ?? "Unknown Student"),
-                    trailing: const Icon(Icons.info_outline),
-                    onTap: () {
-                      // Navigate to student detail or show more info
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Student details feature coming soon"),
+                  );
+                } else if (state is MasterDataListLoaded) {
+                  final students = state.masterDataList
+                      .where((data) => data.batchId == widget.configuration.id)
+                      .toList();
+
+                  if (students.isEmpty) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Text(
+                          "No students in this batch yet",
+                          style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey,
+                          ),
                         ),
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: students.length,
+                    itemBuilder: (context, index) {
+                      final student = students[index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          child: Text(
+                            student.firstName.substring(0, 1).toUpperCase(),
+                          ),
+                        ),
+                        title: Text(
+                            "${student.firstName} ${student.middleName} ${student.lastName}"),
+                        subtitle: Text(student.enrollmentNumber),
+                        trailing: const Icon(Icons.info_outline),
+                        onTap: () {
+                          // Navigate to student detail or show more info
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text("Student details feature coming soon"),
+                            ),
+                          );
+                        },
                       );
                     },
                   );
-                },
-              ),
+                } else if (state is MasterDataError) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        "Error loading students: ${state.message}",
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
           ],
         ),
       ),

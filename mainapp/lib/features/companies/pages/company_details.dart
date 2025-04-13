@@ -25,16 +25,12 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
 
   Future<void> _loadFileNames() async {
     for (final fileId in widget.company.jdFiles) {
-      try {
         final file = await _fileCubit.getFile(fileId);
         if (mounted) {
           setState(() {
             _fileNames[fileId] = file.name;
           });
         }
-      } catch (e) {
-        debugPrint('Error loading file name: $e');
-      }
     }
   }
 
@@ -49,21 +45,21 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
     return BlocProvider.value(
       value: _fileCubit,
       child: Scaffold(
-        appBar: CustomAppBar(
+      appBar: CustomAppBar(
           title: widget.company.name,
-          actions: [
+        actions: [
             BlocBuilder<AuthCubit, AuthState>(
               builder: (context, state) {
                 if (state is AuthAdminAuthenticated ||
                     state is AuthCoordinatorAuthenticated) {
                   return IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
+            onPressed: () {
+              Navigator.push(
+                context,
                         EditCompanyPage.route(widget.company),
-                      );
-                    },
-                    icon: const Icon(Icons.edit),
+              );
+            },
+            icon: const Icon(Icons.edit),
                   );
                 }
                 return const SizedBox.shrink();
@@ -134,7 +130,6 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                     final fileUrl = _fileCubit.getFileViewUrl(
                         fileId, Buckets.jdFilesBucket);
                     if (mounted) {
-                      print("fileUrl: $fileUrl");
                       await launchUrl(Uri.parse(fileUrl));
                     }
                   } catch (e) {
@@ -211,9 +206,9 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
         ],
       ),
       padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           Row(
             children: [
               Container(
@@ -302,11 +297,11 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                   );
                 },
                 borderRadius: BorderRadius.circular(12),
-                child: Padding(
+              child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -345,7 +340,7 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                             ),
                             child: Text(
                               widget.company.ctc[i],
-                              style: const TextStyle(
+                      style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12,
@@ -373,9 +368,9 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: Row(
+                        child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
+                          children: [
                               Icon(
                                 Icons.how_to_reg,
                                 color: Colors.deepPurple[600],
@@ -441,7 +436,7 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      children: [
+                        children: [
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
@@ -517,9 +512,9 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        const Text(
+            const Text(
                           'Deadline',
-                          style: TextStyle(
+              style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,

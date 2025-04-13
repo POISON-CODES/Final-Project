@@ -13,3 +13,4 @@ part 'file_upload_field.dart';
 part 'configuration_card.dart';
 part 'multiselect_field.dart';
 part 'search_multiselect_field.dart';
+part 'files_uploading_widget.dart';

@@ -1,16 +1,23 @@
 part of 'constants.dart';
 
 class Appwrite {
-  // static String projectEndPoint = 'https://10.5.127.42/v1';
-  static String projectEndPoint = 'https://10.0.0.33/v1';
-  // static String projectEndPoint = 'https://10.5.54.255/v1';
-  // static String projectEndPoint = 'https://10.5.129.135/v1';
+  static String get projectEndPoint {
+    if (kIsWeb) {
+      // For local development, use localhost
+      return 'http://localhost:80/v1';
+    } else {
+      return 'https://10.5.129.76/v1';
+    }
+  }
+
   static String projectName = '67a351b601aca4ed39db';
 
   static final Client client = Client()
       .setEndpoint(projectEndPoint)
       .setProject(projectName)
-      .setSelfSigned();
+      .setSelfSigned(
+          status:
+              true); // Enable self-signed certificates for local development
 
   static final Account account = Account(client);
   static final Teams teams = Teams(client);

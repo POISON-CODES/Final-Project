@@ -18,6 +18,9 @@ class CompanyModel {
   final List<String>? updates;
   final List<String>? students;
 
+  bool get isActive => deadline != null && deadline!.isAfter(DateTime.now());
+  bool get isUserCompany => students?.isNotEmpty ?? false;
+
   CompanyModel({
     required this.id,
     required this.name,

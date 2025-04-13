@@ -1,7 +1,20 @@
 part of 'tabs.dart';
 
-class SettingsPageTab extends StatelessWidget {
+class SettingsPageTab extends StatefulWidget {
   const SettingsPageTab({super.key});
+
+  @override
+  State<SettingsPageTab> createState() => _SettingsPageTabState();
+}
+
+class _SettingsPageTabState extends State<SettingsPageTab> {
+  @override
+  void initState() {
+    super.initState();
+    // Load user's requests when the tab is initialized
+    final user = (context.read<AuthCubit>().state as dynamic).user;
+    context.read<RequestCubit>().getRequestsByUserId(user.id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,152 +28,246 @@ class SettingsPageTab extends StatelessWidget {
 
         final user = (state as dynamic).user;
 
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Settings'),
-          ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildFormButton(
-                  context,
-                  title: 'Fill Master Data',
-                  icon: Icons.person,
-                  isFilled: user.masterDataFilled,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MasterDataFormPage(),
-                      ),
-                    );
-                  },
+    return Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 200,
+                pinned: true,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
                 ),
-                const SizedBox(height: 16),
-                _buildFormButton(
-                  context,
-                  title: 'Fill Default Form',
-                  icon: Icons.description,
-                  isFilled: user.defaultFormFilled,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DefaultFormPage(),
-                      ),
-                    );
-                  },
+                title: const Text(
+                  'Settings',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ],
-            ),
+                centerTitle: true,
+                flexibleSpace: FlexibleSpaceBar(
+                  titlePadding: EdgeInsets.zero,
+                  background: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Theme.of(context).primaryColor,
+                          Theme.of(context).primaryColor.withOpacity(0.8),
+                        ],
+                      ),
+                    ),
+                    child: SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 56),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircleAvatar(
+                              radius: 40,
+                              backgroundColor: Colors.white,
+                              child: Text(
+                                user.name[0].toUpperCase(),
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              user.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              user.email,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle(context, 'Account Settings'),
+                      BlocBuilder<RequestCubit, RequestState>(
+                        builder: (context, requestState) {
+                          String subtitle;
+                          Color? statusColor;
+                          bool isEnabled = true;
+
+                          if (requestState is RequestLoaded) {
+                            final masterDataRequest = requestState.requests
+                                .where((r) => r.type == RequestType.masterData)
+                                .toList();
+
+                            if (masterDataRequest.isNotEmpty) {
+                              final request = masterDataRequest.first;
+                              switch (request.status) {
+                                case RequestStatus.pending:
+                                  subtitle = 'Approval pending';
+                                  statusColor = Colors.orange;
+                                  isEnabled = false;
+                                  break;
+                                case RequestStatus.approved:
+                                  subtitle = 'Already filled';
+                                  statusColor = Colors.green;
+                                  break;
+                                case RequestStatus.rejected:
+                                  subtitle = 'Request rejected, try again';
+                                  statusColor = Colors.red;
+                                  break;
+                              }
+                            } else {
+                              subtitle = 'Fill your profile information';
+                              statusColor = Colors.blue;
+                            }
+                          } else {
+                            subtitle = user.masterDataFilled
+                                ? 'Update your personal information'
+                                : 'Complete your profile information';
+                            statusColor = user.masterDataFilled
+                                ? Colors.green
+                                : Colors.blue;
+                          }
+
+                          return _buildSettingsCard(
+                            context,
+                            title: 'Master Data',
+                            subtitle: subtitle,
+                            icon: Icons.person_outline,
+                            statusColor: statusColor,
+                            onTap: isEnabled
+                                ? () async {
+                                    final navigator = Navigator.of(context);
+
+                                    context.read<RequestCubit>();
+                                    final masterDataCubit =
+                                        context.read<MasterDataCubit>();
+
+                                    // If there's a rejected request, try to get the master data to pre-fill
+                                    if (requestState is RequestLoaded) {
+                                      final rejectedRequest = requestState
+                                          .requests
+                                          .where((r) =>
+                                              r.type ==
+                                                  RequestType.masterData &&
+                                              r.status ==
+                                                  RequestStatus.rejected)
+                                          .firstOrNull;
+
+                                      if (rejectedRequest != null) {
+                                        await masterDataCubit.getMasterDataById(
+                                            rejectedRequest.id!);
+                                      }
+                                    }
+
+                                    navigator.push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const MasterDataFormPage(),
+                                      ),
+                                    );
+                                  }
+                                : null,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      _buildSectionTitle(context, 'App Settings'),
+                      _buildSettingsCard(
+                        context,
+                        title: 'Notifications',
+                        subtitle: 'Manage your notification preferences',
+                        icon: Icons.notifications_outlined,
+                        onTap: () {
+                          // TODO: Implement notifications settings
+                        },
+                      ),
+                      _buildSettingsCard(
+                        context,
+                        title: 'Theme',
+                        subtitle: 'Change app appearance',
+                        icon: Icons.palette_outlined,
+                        onTap: () {
+                          // TODO: Implement theme settings
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      _buildLogoutButton(context),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
     );
   }
 
-//   Widget _buildFormButton(
-//     BuildContext context, {
-//     required String title,
-//     required IconData icon,
-//     required bool isCompleted,
-//     required VoidCallback onTap,
-//   }) {
-//     return Card(
-//       child: InkWell(
-//         onTap: onTap,
-//         child: Padding(
-//           padding: const EdgeInsets.all(16),
-//           child: Row(
-//             children: [
-//               Icon(icon, size: 32),
-//               const SizedBox(width: 16),
-//               Expanded(
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Text(
-//                       title,
-//                       style: Theme.of(context).textTheme.titleMedium,
-//                     ),
-//                     const SizedBox(height: 4),
-//                     Text(
-//                       isCompleted ? 'Completed' : 'Not Completed',
-//                       style: Theme.of(context).textTheme.bodySmall,
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//               Container(
-//                 padding: const EdgeInsets.symmetric(
-//                   horizontal: 12,
-//                   vertical: 6,
-//                 ),
-//                 decoration: BoxDecoration(
-//                   color: isCompleted ? Colors.green : Colors.orange,
-//                   borderRadius: BorderRadius.circular(16),
-//                 ),
-//                 child: Text(
-//                   isCompleted ? 'Done' : 'Fill Now',
-//                   style: const TextStyle(
-//                     color: Colors.white,
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
+      ),
+    );
+  }
 
-  Widget _buildFormButton(
+  Widget _buildSettingsCard(
     BuildContext context, {
     required String title,
+    required String subtitle,
     required IconData icon,
-    required bool isFilled,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
+    Color? statusColor,
   }) {
-    return Material(
-      color: Colors.transparent,
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        child: Container(
+        child: Padding(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.deepPurple[400]!,
-                Colors.deepPurple[700]!,
-              ],
-            ),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.deepPurple.withOpacity(0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
+                  color: (statusColor ?? Theme.of(context).primaryColor)
+                      .withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   icon,
-                  color: Colors.white,
+                  color: statusColor ?? Theme.of(context).primaryColor,
                   size: 24,
                 ),
               ),
@@ -171,65 +278,53 @@ class SettingsPageTab extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                     const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(
-                          isFilled ? 'Completed' : 'Not Completed',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 14,
-                          ),
-                        ),
-                        if (isFilled) ...[
-                          const SizedBox(width: 8),
-                          Icon(
-                            Icons.check_circle,
-                            color: Colors.green[300],
-                            size: 16,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isFilled ? Colors.green : Colors.orange,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (isFilled) ...[
-                      const Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                    ],
                     Text(
-                      isFilled ? 'Done' : 'Fill Now',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                      ),
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: statusColor ?? Colors.grey[600],
+                          ),
                     ),
                   ],
                 ),
               ),
+              if (statusColor == Colors.green)
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: 24,
+                )
+              else if (onTap != null)
+                Icon(
+                  Icons.chevron_right,
+                  color: Colors.grey[400],
+                ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          context.read<AuthCubit>().signOut();
+        },
+        icon: const Icon(Icons.logout),
+        label: const Text('Logout'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),

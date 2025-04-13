@@ -12,10 +12,12 @@ class AuthRemoteRepository {
         documentId: user.$id,
       );
 
-      return UserModel.fromMap({
+      final userModel = UserModel.fromMap({
         ...user.toMap(),
         ...userDoc.data,
       });
+
+      return userModel;
     } catch (e) {
       return null;
     }
@@ -54,7 +56,6 @@ class AuthRemoteRepository {
     required String password,
     required String name,
     required String phoneNumber,
-    Role role = Role.student,
   }) async {
     try {
       final user = await Appwrite.account.create(
@@ -71,19 +72,19 @@ class AuthRemoteRepository {
         data: {
           'name': name,
           'email': email,
-          'phone_number': phoneNumber,
-          'role': role.toString().split('.').last,
-          'master_data_filled': false,
-          'default_form_filled': false,
+          'phoneNumber': phoneNumber,
+          'role': Role.student.name,
+          'masterDataFilled': false,
+          'defaultFormFilled': false,
         },
       );
 
       return UserModel.fromMap({
         ...user.toMap(),
-        'phone_number': phoneNumber,
-        'role': role.toString().split('.').last,
-        'master_data_filled': false,
-        'default_form_filled': false,
+        'phoneNumber': phoneNumber,
+        'role': Role.student.name,
+        'masterDataFilled': false,
+        'defaultFormFilled': false,
       });
     } on AppwriteException catch (e) {
       throw Exception('Signup failed: ${e.message}');
@@ -155,15 +156,11 @@ class AuthRemoteRepository {
   Future<void> updateUserFormStatus({
     required String userId,
     bool? masterDataFilled,
-    bool? defaultFormFilled,
   }) async {
     try {
       final Map<String, dynamic> data = {};
       if (masterDataFilled != null) {
-        data['master_data_filled'] = masterDataFilled;
-      }
-      if (defaultFormFilled != null) {
-        data['default_form_filled'] = defaultFormFilled;
+        data['masterDataFilled'] = masterDataFilled;
       }
 
       await Appwrite.databases.updateDocument(

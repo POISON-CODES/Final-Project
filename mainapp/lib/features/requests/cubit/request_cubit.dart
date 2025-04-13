@@ -91,20 +91,21 @@ class RequestCubit extends Cubit<RequestState> {
     }
   }
 
-  Future<void> createRequest(RequestModel request) async {
+  Future<void> createRequest(RequestModel request, String id) async {
     try {
       emit(RequestLoading());
-      final createdRequest = await _repository.createRequest(request);
+      final createdRequest = await _repository.createRequest(request, id);
       emit(RequestCreated(createdRequest));
     } catch (e) {
       emit(RequestError(e.toString()));
     }
   }
 
-  Future<void> updateRequest(RequestModel request) async {
+  Future<void> updateRequest(RequestModel request, String id) async {
     try {
       emit(RequestLoading());
-      final updatedRequest = await _repository.updateRequest(request);
+      final updatedRequest =
+          await _repository.updateRequest(id, request.toJson());
       emit(RequestUpdated(updatedRequest));
     } catch (e) {
       emit(RequestError(e.toString()));
