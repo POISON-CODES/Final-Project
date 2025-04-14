@@ -122,13 +122,28 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> updateUserFormStatus({
     required String userId,
     bool? masterDataFilled,
-    bool? defaultFormFilled,
   }) async {
     try {
       emit(AuthLoading());
       await _authRepository.updateUserFormStatus(
         userId: userId,
         masterDataFilled: masterDataFilled,
+      );
+      await checkAuthStatus(); // Refresh the auth state to reflect the changes
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> updateUserCompanies({
+    required String userId,
+    required List<String> companies,
+  }) async {
+    try {
+      emit(AuthLoading());
+      await _authRepository.updateUserCompanies(
+        userId: userId,
+        companies: companies,
       );
       await checkAuthStatus(); // Refresh the auth state to reflect the changes
     } catch (e) {

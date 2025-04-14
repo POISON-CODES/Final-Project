@@ -76,6 +76,7 @@ class AuthRemoteRepository {
           'role': Role.student.name,
           'masterDataFilled': false,
           'defaultFormFilled': false,
+          'companies': [],
         },
       );
 
@@ -85,6 +86,7 @@ class AuthRemoteRepository {
         'role': Role.student.name,
         'masterDataFilled': false,
         'defaultFormFilled': false,
+        'companies': [],
       });
     } on AppwriteException catch (e) {
       throw Exception('Signup failed: ${e.message}');
@@ -134,6 +136,7 @@ class AuthRemoteRepository {
           'role': doc.data['role'],
           '\$createdAt': doc.$createdAt,
           '\$updatedAt': doc.$updatedAt,
+          'companies': doc.data['companies'] ?? [],
         });
       }).toList();
     } catch (e) {
@@ -171,6 +174,24 @@ class AuthRemoteRepository {
       );
     } catch (e) {
       throw Exception('Failed to update user form status: $e');
+    }
+  }
+
+  Future<void> updateUserCompanies({
+    required String userId,
+    required List<String> companies,
+  }) async {
+    try {
+      await Appwrite.databases.updateDocument(
+        databaseId: DatabaseIds.crcDatabase,
+        collectionId: CollectionsIds.usersCollection,
+        documentId: userId,
+        data: {
+          'companies': companies,
+        },
+      );
+    } catch (e) {
+      throw Exception('Failed to update user companies: $e');
     }
   }
 }

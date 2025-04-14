@@ -45,6 +45,7 @@ class CollectionsIds {
   static const String updatesCollection = '67e7bb6200014fc54cff';
   static const String masterCollection = '67f1020d00130b5f8a3e';
   static const String requestsCollection = '67f2566a0001b50aa76b';
+  static const String applicationsCollection = '67fbfffb003d9f5bf654';
 }
 
 class FunctionIds {

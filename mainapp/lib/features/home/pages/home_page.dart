@@ -29,6 +29,35 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
+        final bool isAdminOrCoordinator = state is AuthAdminAuthenticated ||
+            state is AuthCoordinatorAuthenticated;
+
+        // Define base tabs that are visible to all users
+        final List<GButton> baseTabs = [
+          const GButton(
+            icon: CupertinoIcons.building_2_fill,
+            text: 'Companies',
+          ),
+          const GButton(
+            icon: CupertinoIcons.person_2_fill,
+            text: 'Users',
+          ),
+          if (isAdminOrCoordinator) ...[
+            const GButton(
+              icon: CupertinoIcons.doc_text,
+              text: 'Requests',
+            ),
+            const GButton(
+              icon: CupertinoIcons.chart_bar,
+              text: 'Stats',
+            ),
+          ],
+          const GButton(
+            icon: CupertinoIcons.gear,
+            text: 'Settings',
+          ),
+        ];
+
         return Scaffold(
           floatingActionButton: (state is AuthAdminAuthenticated)
               ? customFloatingActionButton(
@@ -68,49 +97,44 @@ class _HomePageState extends State<HomePage> {
                       : (_selectedPage == 1)
                           ? const UsersPageTab()
                           : (_selectedPage == 2)
-                              ? const RequestsPageTab()
+                              ? isAdminOrCoordinator
+                                  ? const RequestsPageTab()
+                                  : const SettingsPageTab()
                               : (_selectedPage == 3)
-                                  ? const StatsPageTab()
+                                  ? isAdminOrCoordinator
+                                      ? const StatsPageTab()
+                                      : const SettingsPageTab()
                                   : const SettingsPageTab()),
             ),
           ),
           bottomNavigationBar: Padding(
             padding: const EdgeInsets.all(8.0).copyWith(bottom: 15),
             child: GNav(
-              onTabChange: (value) => setState(() {
-                _selectedPage = value;
-              }),
+              onTabChange: (value) {
+                // Adjust the selected page index based on user role
+                setState(() {
+                  if (!isAdminOrCoordinator && value >= 2) {
+                    // For regular users, skip Requests and Stats tabs
+                    _selectedPage = value + 2;
+                  } else {
+                    _selectedPage = value;
+                  }
+                });
+              },
               gap: 5,
               haptic: true,
               activeColor: Colors.white,
-              selectedIndex: _selectedPage,
+              selectedIndex: isAdminOrCoordinator
+                  ? _selectedPage
+                  : _selectedPage >= 2
+                      ? _selectedPage - 2
+                      : _selectedPage,
               tabBackgroundColor: Colors.black,
               tabActiveBorder: Border.all(),
               tabBorderRadius: 100,
               textSize: 20,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              tabs: const [
-                GButton(
-                  icon: CupertinoIcons.building_2_fill,
-                  text: 'Companies',
-                ),
-                GButton(
-                  icon: CupertinoIcons.person_2_fill,
-                  text: 'Users',
-                ),
-                GButton(
-                  icon: CupertinoIcons.doc_text,
-                  text: 'Requests',
-                ),
-                GButton(
-                  icon: CupertinoIcons.chart_bar,
-                  text: 'Stats',
-                ),
-                GButton(
-                  icon: CupertinoIcons.gear,
-                  text: 'Settings',
-                )
-              ],
+              tabs: baseTabs,
             ),
           ),
         );

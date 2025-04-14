@@ -11,6 +11,7 @@ import 'package:mainapp/features/configurations/cubit/configuration_cubit.dart';
 import 'package:mainapp/features/files/cubit/file_cubit.dart';
 import 'package:mainapp/features/forms/cubit/form_cubit.dart' as form_cubit;
 import 'package:mainapp/features/forms/page/form_pages.dart';
+import 'package:mainapp/features/master_data/pages/master_data_form_page.dart';
 import 'package:mainapp/models/models.dart';
 
 part 'company_details.dart';

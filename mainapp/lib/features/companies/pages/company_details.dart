@@ -25,12 +25,12 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
 
   Future<void> _loadFileNames() async {
     for (final fileId in widget.company.jdFiles) {
-        final file = await _fileCubit.getFile(fileId);
-        if (mounted) {
-          setState(() {
-            _fileNames[fileId] = file.name;
-          });
-        }
+      final file = await _fileCubit.getFile(fileId);
+      if (mounted) {
+        setState(() {
+          _fileNames[fileId] = file.name;
+        });
+      }
     }
   }
 
@@ -45,21 +45,21 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
     return BlocProvider.value(
       value: _fileCubit,
       child: Scaffold(
-      appBar: CustomAppBar(
+        appBar: CustomAppBar(
           title: widget.company.name,
-        actions: [
+          actions: [
             BlocBuilder<AuthCubit, AuthState>(
               builder: (context, state) {
                 if (state is AuthAdminAuthenticated ||
                     state is AuthCoordinatorAuthenticated) {
                   return IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
                         EditCompanyPage.route(widget.company),
-              );
-            },
-            icon: const Icon(Icons.edit),
+                      );
+                    },
+                    icon: const Icon(Icons.edit),
                   );
                 }
                 return const SizedBox.shrink();
@@ -206,9 +206,9 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
         ],
       ),
       padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Row(
             children: [
               Container(
@@ -290,18 +290,32 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Registration functionality coming soon!"),
-                    ),
-                  );
+                  final authState = context.read<AuthCubit>().state;
+                  late UserModel user;
+                  if (authState is AuthAdminAuthenticated) {
+                    user = authState.user;
+                  } else if (authState is AuthCoordinatorAuthenticated) {
+                    user = authState.user;
+                  } else if (authState is AuthStudentAuthenticated) {
+                    user = authState.user;
+                  }
+                  if (!user.masterDataFilled) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MasterDataFormPage(),
+                      ),
+                    );
+                  } else {
+                    // Register the user for the company
+                  }
                 },
                 borderRadius: BorderRadius.circular(12),
-              child: Padding(
+                child: Padding(
                   padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -340,7 +354,7 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                             ),
                             child: Text(
                               widget.company.ctc[i],
-                      style: const TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12,
@@ -354,12 +368,30 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                         width: double.infinity,
                         child: TextButton(
                           onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                    "Registration functionality coming soon!"),
-                              ),
-                            );
+                            final authState = context.read<AuthCubit>().state;
+                            late UserModel user;
+                            if (authState is AuthAdminAuthenticated) {
+                              user = authState.user;
+                            } else if (authState
+                                is AuthCoordinatorAuthenticated) {
+                              user = authState.user;
+                            } else if (authState is AuthStudentAuthenticated) {
+                              user = authState.user;
+                            }
+                            if (!user.masterDataFilled) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const MasterDataFormPage(),
+                                ),
+                              );
+                            } else {
+                              // check if the formid says default.
+                              // if yes, : add the company to the user's companies list, and update the user's id in the companies students list.
+                              //  create an application with the company id and the user id, data will be extracted from the user's master data, extract the following data
+                              // first name, middle name, last name, enrollment number, gender, mobile number, email, college location, current location, preferred location, std10thpercentage, std12thpercentage, graduation degree, graduation percentage, graduation specialization, graduation year of passing, masters degree, masters year of passout, masters percentage, masters specialziation, prior experience, experience in months (0 by default), resumelink, technical work link, resume file, technical work file, resume file name, technical work file name, resume file id, technical work link, position applied (take from the current posotion applied)
+                            }
                           },
                           style: TextButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -368,9 +400,9 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                        child: Row(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                            children: [
                               Icon(
                                 Icons.how_to_reg,
                                 color: Colors.deepPurple[600],
@@ -436,7 +468,7 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                        children: [
+                      children: [
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
@@ -512,9 +544,9 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                           ),
                         ),
                         const SizedBox(width: 12),
-            const Text(
+                        const Text(
                           'Deadline',
-              style: TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,

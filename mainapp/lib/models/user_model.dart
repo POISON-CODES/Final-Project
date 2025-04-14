@@ -9,6 +9,7 @@ class UserModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool masterDataFilled;
+  final List<String>? companies;
 
   UserModel({
     required this.id,
@@ -19,6 +20,7 @@ class UserModel {
     required this.createdAt,
     required this.updatedAt,
     this.masterDataFilled = false,
+    this.companies,
   });
 
   // factory UserModel.fromAppwrite(User user) {
@@ -42,6 +44,7 @@ class UserModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? masterDataFilled,
+    List<String>? companies,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -52,6 +55,7 @@ class UserModel {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       masterDataFilled: masterDataFilled ?? this.masterDataFilled,
+      companies: companies ?? this.companies,
     );
   }
 
@@ -62,6 +66,7 @@ class UserModel {
       'phone_number': phoneNumber,
       'role': role.toString().split('.').last,
       'master_data_filled': masterDataFilled,
+      'companies': companies,
     };
   }
 
@@ -75,6 +80,8 @@ class UserModel {
       createdAt: DateTime.parse(map['\$createdAt']),
       updatedAt: DateTime.parse(map['\$updatedAt']),
       masterDataFilled: map['masterDataFilled'] ?? false,
+      companies:
+          map['companies'] != null ? List<String>.from(map['companies']) : null,
     );
   }
 
@@ -85,7 +92,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, role: $role, createdAt: $createdAt, updatedAt: $updatedAt, masterDataFilled: $masterDataFilled)';
+    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, role: $role, createdAt: $createdAt, updatedAt: $updatedAt, masterDataFilled: $masterDataFilled, companies: $companies)';
   }
 
   @override
@@ -99,7 +106,8 @@ class UserModel {
         other.role == role &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt &&
-        other.masterDataFilled == masterDataFilled;
+        other.masterDataFilled == masterDataFilled &&
+        listEquals(other.companies, companies);
   }
 
   @override
@@ -111,6 +119,7 @@ class UserModel {
         role.hashCode ^
         createdAt.hashCode ^
         updatedAt.hashCode ^
-        masterDataFilled.hashCode;
+        masterDataFilled.hashCode ^
+        (companies?.hashCode ?? 0);
   }
 }
